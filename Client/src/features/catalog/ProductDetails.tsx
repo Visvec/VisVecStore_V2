@@ -48,6 +48,9 @@ export default function ProductDetails() {
              label = "Quantity in basket"
              fullWidth
              defaultValue={1}
+             slotProps={{input:{
+                                  inputProps:{
+                                                min: 1, max: product.quantityInStock}}}}
             />
            </Grid>
            <Grid size = {6}>
