@@ -34,7 +34,7 @@ const dispatch = useAppDispatch();
     <AppBar position="fixed">
       <Toolbar sx={{disply: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <Box display ='flex' alignItems = 'center'>
-          <Typography component={NavLink} sx={navStyles} to='/' variant="h6">VISVEC</Typography>
+          <Typography component={NavLink} sx={navStyles} to='/' variant="h6">VISVEC Store</Typography>
           <IconButton onClick={() => dispatch(setDarkMode())}>
             {darkMode ? <DarkMode /> : <LightMode sx={{ color: 'yellow' }} />}
           </IconButton>
