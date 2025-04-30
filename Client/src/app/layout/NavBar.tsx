@@ -4,6 +4,8 @@ import { Link, NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { setDarkMode } from "./uiSlice";
 import { useFetchCartQuery } from "../../features/cart/cartApi";
+import UserMenu from "./UserMenu";
+import { useUserInfoQuery } from "../../features/account/accountApi";
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -29,16 +31,17 @@ const navStyles = {
 }
 
 export default function NavBar() {
-const {isLoading, darkMode} = useAppSelector(state => state.ui);
-const dispatch = useAppDispatch();
-const {data: cart} = useFetchCartQuery();
+  const {data: user} = useUserInfoQuery();
+  const { isLoading, darkMode } = useAppSelector(state => state.ui);
+  const dispatch = useAppDispatch();
+  const { data: cart } = useFetchCartQuery();
 
- const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0)  || 0;
+  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   return (
     <AppBar position="fixed">
-      <Toolbar sx={{disply: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <Box display ='flex' alignItems = 'center'>
+      <Toolbar sx={{ disply: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box display='flex' alignItems='center'>
           <Typography component={NavLink} sx={navStyles} to='/' variant="h6">VISVEC Store</Typography>
           <IconButton onClick={() => dispatch(setDarkMode())}>
             {darkMode ? <DarkMode /> : <LightMode sx={{ color: 'yellow' }} />}
@@ -58,35 +61,40 @@ const {data: cart} = useFetchCartQuery();
           ))}
         </List>
 
-         <Box display = 'flex' alignItems = 'center'>
-         <IconButton component={Link} to='/cart' size="large" sx={{ color: 'inherit' }}>
-          <Badge badgeContent={itemCount} color="secondary">
-            <ShoppingCart />
-          </Badge>
+        <Box display='flex' alignItems='center'>
+          <IconButton component={Link} to='/cart' size="large" sx={{ color: 'inherit' }}>
+            <Badge badgeContent={itemCount} color="secondary">
+              <ShoppingCart />
+            </Badge>
 
-        </IconButton>
+          </IconButton>
 
-        <List sx={{ display: 'flex' }}>
-          {rightLinks.map(({ title, path }) => (
-            <ListItem
-              component={NavLink}
-              to={path}
-              key={path}
-              sx={navStyles}
-            >
-              {title.toUpperCase()}
-            </ListItem>
-          ))}
-        </List>
-         </Box>
-        
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <List sx={{ display: 'flex' }}>
+              {rightLinks.map(({ title, path }) => (
+                <ListItem
+                  component={NavLink}
+                  to={path}
+                  key={path}
+                  sx={navStyles}
+                >
+                  {title.toUpperCase()}
+                </ListItem>
+              ))}
+            </List>
+          )}
+
+        </Box>
+
       </Toolbar>
 
-{isLoading && (
-  <Box sx={{width: '100%'}}>
-    <LinearProgress color = "secondary"/>
-  </Box>
-)}
+      {isLoading && (
+        <Box sx={{ width: '100%' }}>
+          <LinearProgress color="secondary" />
+        </Box>
+      )}
     </AppBar>
   )
 }

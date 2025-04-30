@@ -13,7 +13,8 @@ export default function CartPage() {
     return (
     <Typography variant="h3">
        Your cart is empty.{' '}
-       <Link to = '/catalog' style = {{ fontStyle: 'italic', fontSize: '0.8em', color: 'blue'}} >
+       <Link to = '/catalog' style = {{ fontStyle: 'italic', fontSize: 
+                    '0.8em', color: '#FFA500', fontWeight: 'bold'}} >
           Continue shopping
        </Link>
        </Typography>
