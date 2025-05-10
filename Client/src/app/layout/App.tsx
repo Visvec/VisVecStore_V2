@@ -35,7 +35,6 @@ const theme = createTheme({
    <Outlet />
     </Container>
     </Box>
-   
     </ThemeProvider>
   )
 }

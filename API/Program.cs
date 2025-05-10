@@ -6,12 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 👇 Ensure development config is loaded
+builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<StoreContext>(opt => 
 {
-   opt.UseSqlite (builder.Configuration.GetConnectionString("DefaultConnection"));
+   opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 builder.Services.AddCors();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(opt => 
@@ -21,19 +26,27 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
    .AddRoles<IdentityRole>()
    .AddEntityFrameworkStores<StoreContext>();
 
+// 👇 Register HttpClient for PaymentController
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors(opt =>
 {
- opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("https://localhost:3000");
+   opt.AllowAnyHeader()
+      .AllowAnyMethod()
+      .AllowCredentials()
+      .WithOrigins("https://localhost:3000");
 });
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGroup("api").MapIdentityApi<User>();//api/login
+app.MapGroup("api").MapIdentityApi<User>();
 
 DbInitializer.InitDb(app);
 
