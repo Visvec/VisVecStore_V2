@@ -6,6 +6,7 @@ import { setDarkMode } from "./uiSlice";
 import { useFetchCartQuery } from "../../features/cart/cartApi";
 import UserMenu from "./UserMenu";
 import { useUserInfoQuery } from "../../features/account/accountApi";
+import VisVec_Logo from '../../LOGO/VisVec_Logo.png'; // adjust path as needed
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -31,7 +32,7 @@ const navStyles = {
 }
 
 export default function NavBar() {
-  const {data: user} = useUserInfoQuery();
+  const { data: user } = useUserInfoQuery();
   const { isLoading, darkMode } = useAppSelector(state => state.ui);
   const dispatch = useAppDispatch();
   const { data: cart } = useFetchCartQuery();
@@ -42,7 +43,23 @@ export default function NavBar() {
     <AppBar position="fixed">
       <Toolbar sx={{ disply: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box display='flex' alignItems='center'>
-          <Typography component={NavLink} sx={navStyles} to='/' variant="h6">VISVEC Store</Typography>
+
+            <Box display="flex" alignItems="center" gap={1}>
+  <Box
+    component="img"
+    src={VisVec_Logo}
+    alt="Logo"
+    style={{ width: '40px', height: '40px', marginTop: '2px' }}
+  />
+  <Typography
+    component={NavLink}
+    sx={navStyles}
+    to="/"
+    variant="h6"
+  >
+    VISVEC Store
+  </Typography>
+</Box>
           <IconButton onClick={() => dispatch(setDarkMode())}>
             {darkMode ? <DarkMode /> : <LightMode sx={{ color: 'yellow' }} />}
           </IconButton>
