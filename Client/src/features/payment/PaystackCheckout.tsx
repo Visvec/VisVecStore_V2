@@ -83,6 +83,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         provider: form.provider,
         reference: result?.data?.reference || ''
       };
+       localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
 
       if (response.ok && result.status === true) {
         toast.success('Mobile money charge initiated!');
@@ -92,14 +93,19 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         handleNext('failed', paymentDetails);
       }
     } catch {
-      toast.error('Error initiating mobile money payment');
-      handleNext('failed', {
-        amount: totalAmount * 100,
-        email: form.email,
-        phone: form.phone,
-        provider: form.provider
-      });
-    }
+    const paymentDetails: PaymentDetails = {
+      amount: totalAmount * 100,
+      email: form.email,
+      phone: form.phone,
+      provider: form.provider
+    };
+
+    // Save paymentDetails to localStorage even on error
+    localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
+
+    toast.error('Error initiating mobile money payment');
+    handleNext('failed', paymentDetails);
+  }
   };
 
   return (

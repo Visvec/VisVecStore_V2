@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useNavigate } from 'react-router-dom';
 
 interface ReviewProps {
   paymentStatus: 'success' | 'failed' | 'pending';
@@ -35,6 +36,12 @@ const Review: React.FC<ReviewProps> = ({
   paymentDetails,
   onTryAgain
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewOrders = () => {
+    navigate('/orders');
+  };
+
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 2 }}>
       {paymentStatus === 'success' && (
@@ -124,7 +131,7 @@ const Review: React.FC<ReviewProps> = ({
         
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
           <Typography variant="h6">Total Amount:</Typography>
-          <Typography variant="h6">GHS {((paymentDetails.amount)/100).toFixed(2)}</Typography>
+          <Typography variant="h6">GHS {(paymentDetails.amount / 100).toFixed(2)}</Typography>
         </Box>
       </Paper>
       
@@ -133,7 +140,7 @@ const Review: React.FC<ReviewProps> = ({
           <Button 
             variant="contained" 
             color="primary"
-            href="/orders"
+            onClick={handleViewOrders}
           >
             View My Orders
           </Button>

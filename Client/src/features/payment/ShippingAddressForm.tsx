@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
+import { TextField, Button, Typography, Box } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { saveShippingAddress } from '../../redux/slices/cartSlice';
 
-interface ShippingAddressFormProps {
-  onAddressSubmit: (address: {
-    hostel: string;
-    landmark: string;
-    city: string;
-    contact: string;
-    region: string;
-  }) => void;
+interface ShippingAddress {
+  hostel: string;
+  landmark: string;
+  city: string;
+  contact: string;
+  region: string;
 }
 
-const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubmit }) => {
-  const [address, setAddress] = useState({
+interface ShippingAddressFormProps {
+  onAddressSubmit: (address: ShippingAddress) => void;
+  handleNext: () => void;
+}
+
+const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubmit, handleNext }) => {
+  const dispatch = useDispatch();
+
+  const [address, setAddress] = useState<ShippingAddress>({
     hostel: '',
     landmark: '',
     city: '',
     contact: '',
     region: ''
   });
+
+  // Simple validation: checks all fields are not empty
+  const validateForm = () => {
+    return Object.values(address).every(field => field.trim() !== '');
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,14 +42,22 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Instead of making the API call here, we pass the address up to the parent
+
+    if (!validateForm()) {
+      alert('Please fill all fields');
+      return;
+    }
+
+    dispatch(saveShippingAddress(address));
+    localStorage.setItem('shippingAddress', JSON.stringify(address));
     onAddressSubmit(address);
+    handleNext();
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
       <Typography variant="h6" gutterBottom>Shipping Address</Typography>
-      
+
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
           label="Hostel"
@@ -85,11 +104,11 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           value={address.region}
           onChange={handleChange}
         />
-        
-        <Button 
-          type="submit" 
-          variant="contained" 
-          color="primary" 
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
           fullWidth
           sx={{ mt: 2 }}
         >
