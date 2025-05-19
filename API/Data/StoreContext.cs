@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Emit;
 using API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -15,6 +16,7 @@ public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(op
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<Order>().OwnsOne(o => o.ShippingAddress);
 
         builder.Entity<IdentityRole>()
                 .HasData(
