@@ -16,6 +16,10 @@ import { toast } from 'react-toastify';
 import { useFetchCartQuery } from '../cart/cartApi';
 import { Item } from '../../app/models/cart';
 import { SelectChangeEvent } from '@mui/material';
+import { Order } from '../../components/viewOrder/orderUtils'; // 
+
+// Import saveOrderToLocalStorage from your utils file
+import { saveOrderToLocalStorage } from '../../components/viewOrder/orderUtils';
 
 interface ShippingAddress {
   hostel: string;
@@ -25,7 +29,7 @@ interface ShippingAddress {
   region: string;
 }
 
-interface PaymentDetails {
+export interface PaymentDetails {
   amount: number;
   email: string;
   phone: string;
@@ -46,6 +50,17 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
     phone: '',
     provider: 'MTN'
   });
+
+  // Helper to convert cart items to OrderItem[]
+  const mapCartItemsToOrderItems = (items: Item[]) => {
+    return items.map(item => ({
+      productId: item.productId,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      pictureUrl: item.pictureUrl
+    }));
+  };
 
   const subtotal =
     cart?.items.reduce((sum: number, item: Item) => sum + item.price * item.quantity, 0) ?? 0;
@@ -83,29 +98,46 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         provider: form.provider,
         reference: result?.data?.reference || ''
       };
-       localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
+
+      localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
 
       if (response.ok && result.status === true) {
         toast.success('Mobile money charge initiated!');
+
+        // Save the order only if payment is successful
+        if (cart?.items) {
+          const orderItems = mapCartItemsToOrderItems(cart.items);
+          const order: Order = {
+  id: Date.now().toString(),
+  items: orderItems, // this is your array of { productId, name, ... }
+  subtotal,
+  deliveryFee,
+  total: subtotal + deliveryFee,
+  shippingAddress,
+  paymentDetails
+};
+
+saveOrderToLocalStorage(order);
+        }
+
         handleNext('success', paymentDetails);
       } else {
         toast.error(result.message || 'Mobile money charge failed');
         handleNext('failed', paymentDetails);
       }
     } catch {
-    const paymentDetails: PaymentDetails = {
-      amount: totalAmount * 100,
-      email: form.email,
-      phone: form.phone,
-      provider: form.provider
-    };
+      const paymentDetails: PaymentDetails = {
+        amount: totalAmount * 100,
+        email: form.email,
+        phone: form.phone,
+        provider: form.provider
+      };
 
-    // Save paymentDetails to localStorage even on error
-    localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
+      localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
 
-    toast.error('Error initiating mobile money payment');
-    handleNext('failed', paymentDetails);
-  }
+      toast.error('Error initiating mobile money payment');
+      handleNext('failed', paymentDetails);
+    }
   };
 
   return (

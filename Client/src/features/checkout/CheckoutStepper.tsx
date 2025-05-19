@@ -87,7 +87,9 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
 
       <Box sx={{ mt: 2 }}>
         <Box sx={{ display: activeStep === 0 ? 'block' : 'none' }}>
-          <ShippingAddressForm onAddressSubmit={handleAddressSubmit} />
+          <ShippingAddressForm onAddressSubmit={handleAddressSubmit} handleNext={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
         </Box>
         <Box sx={{ display: activeStep === 1 ? 'block' : 'none' }}>
           <PaystackCheckout 
