@@ -1,24 +1,42 @@
-import { Box, Typography, Divider, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button } from '@mui/material';
-import { currencyFormat } from '../../lib/util';
-import { useFetchCartQuery } from '../../features/cart/cartApi';
+import {
+  Box,
+  Typography,
+  Divider,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+  Button
+} from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import ShippingDetails from '../viewOrder/ShippingDetails';
-import PrintIcon from '@mui/icons-material/Print'; // Import the print icon
+import PrintIcon from '@mui/icons-material/Print';
+import { Order } from './orderUtils';
+import { currencyFormat } from '../../lib/util';
 
 const OrderDetails = () => {
-  const { data: cart } = useFetchCartQuery();
+  const { orderId } = useParams();
+  const [order, setOrder] = useState<Order | null>(null);
 
-  const subtotal = cart?.items.reduce((sum, item) => sum + item.quantity * item.price, 0) ?? 0;
-  const deliveryFee = subtotal > 10000 ? 0 : 500;
-  const total = subtotal + deliveryFee;
+  useEffect(() => {
+    const storedOrders = localStorage.getItem('orders');
+    if (storedOrders) {
+      try {
+        const parsed: Order[] = JSON.parse(storedOrders);
+        const found = parsed.find(o => o.id === orderId);
+        setOrder(found ?? null);
+      } catch (err) {
+        console.error('Error parsing stored orders:', err);
+      }
+    }
+  }, [orderId]);
 
-  // Function to handle printing
   const handlePrint = () => {
-    // Add a print-specific stylesheet to hide everything except our print section
     const style = document.createElement('style');
     style.type = 'text/css';
     style.id = 'print-style';
-    
-    // The CSS will hide everything except our print container and properly format it
     const css = `
       @media print {
         body * {
@@ -40,14 +58,9 @@ const OrderDetails = () => {
         }
       }
     `;
-    
     style.appendChild(document.createTextNode(css));
     document.head.appendChild(style);
-    
-    // Trigger browser print dialog
     window.print();
-    
-    // Remove the print stylesheet after printing dialog is closed
     setTimeout(() => {
       const printStyle = document.getElementById('print-style');
       if (printStyle && printStyle.parentNode) {
@@ -56,13 +69,17 @@ const OrderDetails = () => {
     }, 1000);
   };
 
+  if (!order) {
+    return <Typography>Order not found.</Typography>;
+  }
+
   return (
     <Box sx={{ mb: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">Order Summary</Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           startIcon={<PrintIcon />}
           onClick={handlePrint}
           sx={{ ml: 2 }}
@@ -70,13 +87,13 @@ const OrderDetails = () => {
           Print Order
         </Button>
       </Box>
-      
+
       <div id="order-details-print">
         <Divider sx={{ my: 1 }} />
 
         <List>
-          {cart?.items.map((item) => (
-            <ListItem key={item.productId} disablePadding>
+          {order.items?.map((item, idx) => (
+            <ListItem key={idx} disablePadding>
               <ListItemAvatar>
                 <Avatar
                   variant="square"
@@ -96,20 +113,18 @@ const OrderDetails = () => {
         <Divider sx={{ my: 1 }} />
         <Box display="flex" justifyContent="space-between">
           <Typography>Subtotal:</Typography>
-          <Typography>{currencyFormat(subtotal)}</Typography>
+          <Typography>{currencyFormat(order.subtotal ?? 0)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between">
           <Typography>Delivery Fee:</Typography>
-          <Typography>{currencyFormat(deliveryFee)}</Typography>
+          <Typography>{currencyFormat(order.deliveryFee ?? 0)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between">
           <Typography fontWeight="bold">Total:</Typography>
-          <Typography fontWeight="bold">{currencyFormat(total)}</Typography>
+          <Typography fontWeight="bold">{currencyFormat(order.total ?? 0)}</Typography>
         </Box>
 
         <Divider sx={{ my: 2 }} />
-
-        {/* Show shipping details from localStorage here */}
         <ShippingDetails />
       </div>
     </Box>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { User } from "../models/user";
 import { History, Logout, Person } from "@mui/icons-material";
 import { useLogoutMutation } from "../../features/account/accountApi";
+import { Link } from "react-router-dom";  // <-- Import Link here
 
 type Props = {
     user: User
@@ -23,9 +24,9 @@ export default function UserMenu({ user }: Props) {
         <div>
             <Button
                 onClick={handleClick}
-                color = 'inherit'
-                size = 'large'
-                sx={{fontSize: '1.1rem'}}
+                color='inherit'
+                size='large'
+                sx={{ fontSize: '1.1rem' }}
             >
                 {user.email}
             </Button>
@@ -47,12 +48,19 @@ export default function UserMenu({ user }: Props) {
                     </ListItemIcon>
                     <ListItemText>My profile</ListItemText>
                 </MenuItem>
-                <MenuItem>
+
+                {/* Link to OrderList page */}
+                <MenuItem 
+                  component={Link} 
+                  to="/orders" 
+                  onClick={handleClose}  // close menu when clicking
+                >
                     <ListItemIcon>
                         <History />
                     </ListItemIcon>
                     <ListItemText>My orders</ListItemText>
                 </MenuItem>
+
                 <Divider />
                 <MenuItem onClick={logout}>
                     <ListItemIcon>
@@ -61,7 +69,6 @@ export default function UserMenu({ user }: Props) {
                     <ListItemText>Logout</ListItemText>
                 </MenuItem>
             </Menu>
-
         </div>
     );
 }
