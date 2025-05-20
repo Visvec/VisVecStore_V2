@@ -13,12 +13,10 @@ import {
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { toast } from 'react-toastify';
-import { useFetchCartQuery, useRemoveCartItemMutation } from '../cart/cartApi'; // Import your remove mutation here
+import { useFetchCartQuery, useRemoveCartItemMutation } from '../cart/cartApi';
 import { Item } from '../../app/models/cart';
 import { SelectChangeEvent } from '@mui/material';
 import { Order } from '../../components/viewOrder/orderUtils';
-
-// Import saveOrderToLocalStorage from your utils file
 import { saveOrderToLocalStorage } from '../../components/viewOrder/orderUtils';
 
 interface ShippingAddress {
@@ -52,7 +50,6 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
     provider: 'MTN'
   });
 
-  // Helper to convert cart items to OrderItem[]
   const mapCartItemsToOrderItems = (items: Item[]) => {
     return items.map(item => ({
       productId: item.productId,
@@ -63,10 +60,10 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
     }));
   };
 
-  const subtotal =
-    cart?.items.reduce((sum: number, item: Item) => sum + item.price * item.quantity, 0) ?? 0;
+  const subtotal = cart?.items.reduce((sum: number, item: Item) => sum + item.price * item.quantity, 0) ?? 0;
   const deliveryFee = subtotal > 10000 ? 0 : 500;
-  const totalAmount = (subtotal + deliveryFee) / 100;
+  const totalAmount = (subtotal + deliveryFee) / 100; // in GHS
+  const totalAmountInPesewas = totalAmount * 100; // in pesewas
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -85,15 +82,15 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
           email: form.email,
           phone: form.phone,
           provider: form.provider,
-          amount: totalAmount * 100,
-          shippingAddress: shippingAddress
+          amount: totalAmountInPesewas,
+          shippingAddress
         })
       });
 
       const result = await response.json();
 
       const paymentDetails: PaymentDetails = {
-        amount: totalAmount * 100,
+        amount: totalAmountInPesewas,
         email: form.email,
         phone: form.phone,
         provider: form.provider,
@@ -114,12 +111,12 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
             deliveryFee,
             total: subtotal + deliveryFee,
             shippingAddress,
-            paymentDetails
+            paymentDetails,
+            status: 'pending'
           };
 
           saveOrderToLocalStorage(order);
 
-          // Clear cart items by removing each item with full quantity
           for (const item of cart.items) {
             await removeCartItem({ productId: item.productId, quantity: item.quantity }).unwrap();
           }
@@ -132,7 +129,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
       }
     } catch {
       const paymentDetails: PaymentDetails = {
-        amount: totalAmount * 100,
+        amount: totalAmountInPesewas,
         email: form.email,
         phone: form.phone,
         provider: form.provider
@@ -197,10 +194,20 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
           <MenuItem value="AIRTELTIGO">AIRTELTIGO</MenuItem>
         </Select>
       </FormControl>
+
       <Typography variant="body1">Total to be paid: GHS {totalAmount.toFixed(2)}</Typography>
+
       <Button variant="contained" color="primary" onClick={handlePay}>
         Pay with Mobile Money
       </Button>
+
+      <Typography
+        variant="caption"
+        sx={{ mt: 2, color: 'text.secondary', fontStyle: 'italic', textAlign: 'center' }}
+      >
+        Payment confirmation is processed securely via Paystack webhook.<br />
+        Your order status will update automatically once payment is confirmed.
+      </Typography>
     </Box>
   );
 };

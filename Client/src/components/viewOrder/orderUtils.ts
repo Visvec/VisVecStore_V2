@@ -30,6 +30,7 @@ export interface Order {
   total: number;
   shippingAddress: ShippingAddress;
   paymentDetails: PaymentDetails;
+   status: string;
 }
 
 export const saveOrderToLocalStorage = (newOrder: Order) => {

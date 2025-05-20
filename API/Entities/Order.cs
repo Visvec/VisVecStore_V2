@@ -12,8 +12,10 @@ namespace API.Entities
 
         // e.g. ShippingAddress property if you use it:
         public required ShippingAddress ShippingAddress { get; set; }
-       public decimal Subtotal { get; set; }
-    public decimal DeliveryFee { get; set; }
-    public required string PaymentIntentId { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal DeliveryFee { get; set; }
+        public required string PaymentIntentId { get; set; }
+        public string? Reference { get; set; }
+     public string? Status { get; set; }
     }
 }
