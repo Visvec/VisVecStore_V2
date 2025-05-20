@@ -40,7 +40,7 @@ const OrderList = () => {
 
       {orders.length === 0 ? (
         <Box mt={4}>
-          <Typography variant="body1" gutterBottom>
+          <Typography variant="h5" gutterBottom>
             No orders found. Start shopping  {'    '}
             <Link
               to="/catalog"
@@ -52,7 +52,7 @@ const OrderList = () => {
               onMouseOver={(e) => (e.currentTarget.style.textDecoration = 'underline')}
               onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
             >
-              now!
+              Now!
             </Link>
             .
           </Typography>

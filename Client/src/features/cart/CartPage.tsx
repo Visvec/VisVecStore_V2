@@ -11,11 +11,14 @@ export default function CartPage() {
 
   if (!data || data.items.length === 0) {
     return (
-    <Typography variant="h3">
-       Your cart is empty.{' '}
-       <Link to = '/catalog' style = {{ fontStyle: 'italic', fontSize: 
-                    '0.8em', color: '#FFA500', fontWeight: 'bold'}} >
-          Continue shopping
+    <Typography variant="h5" gutterBottom>
+       Your cart is empty. Start Shopping{' '}
+       <Link to = '/catalog' style={{
+                color: '#1976d2',
+                fontWeight: 500,
+                textDecoration: 'none',
+              }} >
+          Now!
        </Link>
        </Typography>
   );
