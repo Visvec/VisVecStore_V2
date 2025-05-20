@@ -13,10 +13,10 @@ import {
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { toast } from 'react-toastify';
-import { useFetchCartQuery } from '../cart/cartApi';
+import { useFetchCartQuery, useRemoveCartItemMutation } from '../cart/cartApi'; // Import your remove mutation here
 import { Item } from '../../app/models/cart';
 import { SelectChangeEvent } from '@mui/material';
-import { Order } from '../../components/viewOrder/orderUtils'; // 
+import { Order } from '../../components/viewOrder/orderUtils';
 
 // Import saveOrderToLocalStorage from your utils file
 import { saveOrderToLocalStorage } from '../../components/viewOrder/orderUtils';
@@ -44,6 +44,7 @@ interface PaystackCheckoutProps {
 
 const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps) => {
   const { data: cart } = useFetchCartQuery();
+  const [removeCartItem] = useRemoveCartItemMutation();
 
   const [form, setForm] = useState({
     email: '',
@@ -104,20 +105,24 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
       if (response.ok && result.status === true) {
         toast.success('Mobile money charge initiated!');
 
-        // Save the order only if payment is successful
         if (cart?.items) {
           const orderItems = mapCartItemsToOrderItems(cart.items);
           const order: Order = {
-  id: Date.now().toString(),
-  items: orderItems, // this is your array of { productId, name, ... }
-  subtotal,
-  deliveryFee,
-  total: subtotal + deliveryFee,
-  shippingAddress,
-  paymentDetails
-};
+            id: Date.now().toString(),
+            items: orderItems,
+            subtotal,
+            deliveryFee,
+            total: subtotal + deliveryFee,
+            shippingAddress,
+            paymentDetails
+          };
 
-saveOrderToLocalStorage(order);
+          saveOrderToLocalStorage(order);
+
+          // Clear cart items by removing each item with full quantity
+          for (const item of cart.items) {
+            await removeCartItem({ productId: item.productId, quantity: item.quantity }).unwrap();
+          }
         }
 
         handleNext('success', paymentDetails);
