@@ -13,7 +13,14 @@ public class AccountController(SignInManager<User>signInManager): BaseApiControl
     [HttpPost("register")]
     public async Task<ActionResult>RegisterUser(RegisterDto registerDto)
     {
-        var user = new User{UserName = registerDto.Email, Email = registerDto.Email};
+        var user = new User
+        {
+            UserName = registerDto.Email,
+            Email = registerDto.Email,
+             FirstName = registerDto.FirstName,
+        LastName = registerDto.LastName,
+        DateOfBirth = registerDto.DateOfBirth
+        };
 
         var result = await signInManager.UserManager.CreateAsync(user,registerDto.Password);
 
