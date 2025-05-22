@@ -42,7 +42,11 @@ export default function UserMenu({ user }: Props) {
                     },
                 }}
             >
-                <MenuItem>
+                <MenuItem
+                component={Link}
+                  to="/profile"
+                  onClick={handleClose}
+                  >
                     <ListItemIcon>
                         <Person />
                     </ListItemIcon>

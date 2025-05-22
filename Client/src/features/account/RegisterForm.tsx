@@ -73,15 +73,16 @@ export default function RegisterForm() {
                         helperText={errors.lastName?.message}
                     />
 
-                    <TextField
-                        fullWidth
-                        label="Date of Birth"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        {...register('dateOfBirth')}
-                        error={!!errors.dateOfBirth}
-                        helperText={errors.dateOfBirth?.message}
-                    />
+                <TextField
+  fullWidth
+  label="Date of Birth"
+  type="date"
+  InputLabelProps={{ shrink: true }}
+  {...register('dateOfBirth')}
+  error={!!errors.dateOfBirth}
+  helperText={errors.dateOfBirth?.message}
+/>
+
                     <TextField
                         fullWidth
                         label='Password'

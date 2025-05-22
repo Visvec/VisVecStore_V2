@@ -1,13 +1,9 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.DTOs;
 
-public class RegisterDto
+public class ProfileDto
 {
-    [Required]
-    public string Email { get; set; } = string.Empty;
-    public required string Password { get; set; }
     [Required]
     public string FirstName { get; set; } = string.Empty;
 
@@ -15,6 +11,7 @@ public class RegisterDto
     public string LastName { get; set; } = string.Empty;
 
     [Required]
-    public DateTime? DateOfBirth { get; set; }
+    public string? DateOfBirth { get; set; }
 
+    public string? PhotoUrl { get; set; }
 }

@@ -11,9 +11,9 @@ export const registerSchema = z.object({
     }),
     firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  dateOfBirth: z.string().refine(date => !isNaN(Date.parse(date)), {
-    message: "Invalid date format"
-  })
+  dateOfBirth: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: 'Date of birth is required',
+}),
 });
 
 export type RegisterSchema = z.infer<typeof registerSchema>;

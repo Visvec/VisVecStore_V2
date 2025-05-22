@@ -5,24 +5,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace API.Controllers;
 
-public class AccountController(SignInManager<User>signInManager): BaseApiController 
+public class AccountController(SignInManager<User> signInManager) : BaseApiController
 {
     [HttpPost("register")]
-    public async Task<ActionResult>RegisterUser(RegisterDto registerDto)
+    public async Task<ActionResult> RegisterUser(RegisterDto registerDto)
     {
         var user = new User
         {
             UserName = registerDto.Email,
             Email = registerDto.Email,
-             FirstName = registerDto.FirstName,
-        LastName = registerDto.LastName,
-        DateOfBirth = registerDto.DateOfBirth
+            FirstName = registerDto.FirstName,
+            LastName = registerDto.LastName,
+            DateOfBirth = registerDto.DateOfBirth
         };
 
-        var result = await signInManager.UserManager.CreateAsync(user,registerDto.Password);
+        var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
@@ -40,17 +41,17 @@ public class AccountController(SignInManager<User>signInManager): BaseApiControl
     }
 
     [HttpGet("user-info")]
-    public async Task<ActionResult>GetUserInfo()
+    public async Task<ActionResult> GetUserInfo()
     {
-        if(User.Identity?.IsAuthenticated == false) return NoContent();
+        if (User.Identity?.IsAuthenticated == false) return NoContent();
 
         var user = await signInManager.UserManager.GetUserAsync(User);
 
-        if(user == null) return Unauthorized();
+        if (user == null) return Unauthorized();
 
         var roles = await signInManager.UserManager.GetRolesAsync(user);
 
-        return Ok(new 
+        return Ok(new
         {
             user.Email,
             user.UserName,
@@ -75,13 +76,13 @@ public class AccountController(SignInManager<User>signInManager): BaseApiControl
             .Include(x => x.Address)
             .FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
 
-        if(user == null) return Unauthorized();
+        if (user == null) return Unauthorized();
 
         user.Address = address;
 
         var result = await signInManager.UserManager.UpdateAsync(user);
 
-        if(!result.Succeeded) return BadRequest("Problem updating user address");
+        if (!result.Succeeded) return BadRequest("Problem updating user address");
 
         return Ok(user.Address);
     }
@@ -95,8 +96,82 @@ public class AccountController(SignInManager<User>signInManager): BaseApiControl
             .Select(x => x.Address)
             .FirstOrDefaultAsync();
 
-        if(address == null) return NoContent();
+        if (address == null) return NoContent();
 
         return address;
     }
+    [Authorize]
+[HttpGet("profile")]
+public async Task<ActionResult<ProfileDto>> GetUserProfile()
+{
+    var user = await signInManager.UserManager.GetUserAsync(User);
+
+    if (user == null) return Unauthorized();
+
+    return new ProfileDto
+    {
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        DateOfBirth = user.DateOfBirth.HasValue 
+    ? user.DateOfBirth.Value.ToString("yyyy-MM-dd") 
+    : null,
+        PhotoUrl = user.PhotoUrl
+    };
+}
+
+    [Authorize]
+    [HttpPost("update-profile")]
+    public async Task<ActionResult> UpdateUserProfile(ProfileDto profileDto)
+    {
+        var user = await signInManager.UserManager.GetUserAsync(User);
+
+        if (user == null) return Unauthorized();
+
+        user.FirstName = profileDto.FirstName;
+        user.LastName = profileDto.LastName;
+      if (!string.IsNullOrEmpty(profileDto.DateOfBirth))
+{
+    user.DateOfBirth = DateTime.Parse(profileDto.DateOfBirth);
+}
+else
+{
+    user.DateOfBirth = null;
+}
+        var result = await signInManager.UserManager.UpdateAsync(user);
+
+        if (!result.Succeeded) return BadRequest("Problem updating profile");
+
+        return Ok();
+    }
+[Authorize]
+[HttpPost("profile/photo")]
+public async Task<ActionResult> UploadProfilePhoto(IFormFile file)
+{
+    if (file == null || file.Length == 0)
+        return BadRequest("No file uploaded");
+
+    var user = await signInManager.UserManager.GetUserAsync(User);
+    if (user == null) return Unauthorized();
+
+    var uploadsFolder = Path.Combine("wwwroot", "images", "profiles");
+    if (!Directory.Exists(uploadsFolder))
+        Directory.CreateDirectory(uploadsFolder);
+
+    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+    var filePath = Path.Combine(uploadsFolder, fileName);
+
+    using (var stream = new FileStream(filePath, FileMode.Create))
+    {
+        await file.CopyToAsync(stream);
+    }
+
+    user.PhotoUrl = $"/images/profiles/{fileName}";
+
+    var result = await signInManager.UserManager.UpdateAsync(user);
+    if (!result.Succeeded) return BadRequest("Problem saving profile photo");
+
+    return Ok(new { user.PhotoUrl });
+}
+
+
 }

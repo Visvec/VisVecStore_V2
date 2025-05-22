@@ -14,6 +14,7 @@ import RegisterForm from "../../features/account/RegisterForm";
 import RequireAuth from "./RequireAuth";
 import OrderList from "../../components/viewOrder/OrderList";
 import OrderDetails from "../../components/viewOrder/OrderDetails";
+import ProfilePage from "../../features/profile/ProfilePage";
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
             {element: <RequireAuth/>, children: [
                 {path: 'checkout', element: <CheckoutPage/>},
                  { path: 'orders', element: <OrderList/> }, 
+                 { path:"/profile", element:<ProfilePage /> },
                  {path: 'order-details/:orderId', element: <OrderDetails/>},
             ]},
             {path: '', element: <HomePage />},
