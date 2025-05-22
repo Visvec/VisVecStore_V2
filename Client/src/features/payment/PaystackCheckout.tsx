@@ -18,6 +18,7 @@ import { Item } from '../../app/models/cart';
 import { SelectChangeEvent } from '@mui/material';
 import { Order } from '../../components/viewOrder/orderUtils';
 import { saveOrderToLocalStorage } from '../../components/viewOrder/orderUtils';
+import { API_URLS } from '../../app/api/apiURLs';
 
 interface ShippingAddress {
   hostel: string;
@@ -75,7 +76,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
 
   const handlePay = async () => {
     try {
-      const response = await fetch('https://localhost:5001/api/payment/mobile-money', {
+      const response = await fetch(API_URLS.mobileMoneyPayment, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

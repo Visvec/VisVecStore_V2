@@ -41,7 +41,8 @@ app.UseCors(opt =>
       .AllowCredentials()
       .WithOrigins("https://localhost:3000");
 });
-
+app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

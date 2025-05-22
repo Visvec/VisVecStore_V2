@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { Order } from '../../components/viewOrder/orderUtils';
+  import { API_URLS } from '../../app/api/apiURLs';
 
 interface OrderStatusCheckerProps {
   reference: string;
@@ -16,7 +17,7 @@ const OrderStatusChecker = ({ reference }: OrderStatusCheckerProps) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`https://localhost:5001/api/orders/status/${reference}`);
+        const response = await fetch(API_URLS.getOrderStatus(reference));
         if (!response.ok) throw new Error('Could not fetch order status');
         const result = await response.json();
         setOrder(result);
