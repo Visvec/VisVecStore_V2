@@ -16,5 +16,11 @@
     <PackageReference Include="Paystack.Net" Version="1.1.1" />
   </ItemGroup>
 
+  <!-- ✅ Ensure SQLite database file is included in publish output -->
+  <ItemGroup>
+    <None Include="store.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
- 

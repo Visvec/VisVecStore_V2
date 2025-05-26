@@ -70,6 +70,7 @@ app.Use(async (context, next) =>
     }
 });
 
-DbInitializer.InitDb(app);
+// ✅ Initialize database (migrations + seed)
+await DbInitializer.InitDbAsync(app);
 
 app.Run();
