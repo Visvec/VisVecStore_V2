@@ -6,49 +6,69 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 👇 Ensure development config is loaded
+// 👇 Load development configuration if available
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<StoreContext>(opt => 
+builder.Services.AddDbContext<StoreContext>(opt =>
 {
-   opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddCors();
-builder.Services.AddTransient<ExceptionMiddleware>();
-builder.Services.AddIdentityApiEndpoints<User>(opt => 
+// ✅ CORS setup for Render deployment
+builder.Services.AddCors(options =>
 {
-   opt.User.RequireUniqueEmail = true;
-})
-   .AddRoles<IdentityRole>()
-   .AddEntityFrameworkStores<StoreContext>();
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
-// 👇 Register HttpClient for PaymentController
+builder.Services.AddTransient<ExceptionMiddleware>();
+
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+})
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StoreContext>();
+
+// 👇 Register HttpClient for controllers like PaymentController
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ✅ Middleware pipeline
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseDefaultFiles();    // Serve index.html if requested
+app.UseStaticFiles();     // Serve files from wwwroot
 
-app.UseCors(opt =>
-{
-   opt.AllowAnyHeader()
-      .AllowAnyMethod()
-      .AllowCredentials()
-      .WithOrigins("https://localhost:3000");
-});
+app.UseCors("AllowAll");  // ✅ Apply CORS policy for all origins
+
 app.UseHttpsRedirection();
-app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseStaticFiles();
 app.MapGroup("api").MapIdentityApi<User>();
+
+// ✅ React/Vite SPA fallback middleware
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 404 &&
+        !System.IO.Path.HasExtension(context.Request.Path.Value))
+    {
+        context.Request.Path = "/index.html";
+        await next();
+    }
+});
 
 DbInitializer.InitDb(app);
 
