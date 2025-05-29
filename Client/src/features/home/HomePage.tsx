@@ -18,8 +18,8 @@ export default function HomePage() {
     <Box
       maxWidth="xl"
       mx="auto"
-      px={4}
-      height="400px"
+      px={{ xs: 2, sm: 4, md: 6 }}     // responsive horizontal padding
+      height={{ xs: 300, sm: 350, md: 400 }} // responsive height
       position="relative"
       overflow="hidden"
       borderRadius="16px"
@@ -56,10 +56,10 @@ export default function HomePage() {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        p={8}
+        p={{ xs: 3, sm: 6, md: 8 }}   // responsive padding
         zIndex={2}
         sx={{
-          backgroundColor: "rgba(0, 0, 0, 0.4)", // semi-transparent dark overlay
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
           backdropFilter: "blur(2px)",
           borderRadius: "16px",
         }}
@@ -69,7 +69,7 @@ export default function HomePage() {
           color="white"
           fontWeight="bold"
           textAlign="center"
-          sx={{ my: 3 }}
+          sx={{ my: { xs: 2, md: 3 }, px: { xs: 1, sm: 2, md: 0 } }}  // margin and padding responsive
         >
           Welcome to Visvec Store!
         </Typography>
@@ -80,12 +80,13 @@ export default function HomePage() {
           to="/catalog"
           color="primary"
           sx={{
-            mt: 8,
+            mt: { xs: 4, sm: 6, md: 8 },
             fontWeight: "bold",
             color: "white",
             borderRadius: "16px",
-            px: 8,
-            py: 2,
+            px: { xs: 4, sm: 6, md: 8 },  // responsive horizontal padding
+            py: { xs: 1.5, sm: 2, md: 2 },
+            minWidth: { xs: 'auto', md: 150 } // better sizing on small devices
           }}
         >
           Shop Now

@@ -43,7 +43,12 @@ const Review: React.FC<ReviewProps> = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 2 }}>
+    <Box sx={{ 
+      maxWidth: { xs: '90%', sm: 600 }, 
+      mx: 'auto', 
+      mt: 2, 
+      px: { xs: 1, sm: 0 } // small padding on mobile so edges don't touch
+    }}>
       {paymentStatus === 'success' && (
         <Alert 
           icon={<CheckCircleOutlineIcon fontSize="inherit" />} 
@@ -93,10 +98,10 @@ const Review: React.FC<ReviewProps> = ({
           <Typography variant="h6" gutterBottom>
             Shipping Information
           </Typography>
-          <Typography variant="body1">
-            {shippingAddress.hostel}<br />
-            {shippingAddress.landmark}<br />
-            {shippingAddress.city}, {shippingAddress.region}<br />
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+            {shippingAddress.hostel}{'\n'}
+            {shippingAddress.landmark}{'\n'}
+            {shippingAddress.city}, {shippingAddress.region}{'\n'}
             Contact: {shippingAddress.contact}
           </Typography>
         </Box>
@@ -107,20 +112,20 @@ const Review: React.FC<ReviewProps> = ({
           <Typography variant="h6" gutterBottom>
             Payment Details
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap' }}>
             <Typography variant="body1">Payment Method:</Typography>
             <Typography variant="body1">{paymentDetails.provider} Mobile Money</Typography>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap' }}>
             <Typography variant="body1">Email:</Typography>
             <Typography variant="body1">{paymentDetails.email}</Typography>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap' }}>
             <Typography variant="body1">Phone:</Typography>
             <Typography variant="body1">{paymentDetails.phone}</Typography>
           </Box>
           {paymentDetails.reference && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap' }}>
               <Typography variant="body1">Reference:</Typography>
               <Typography variant="body1">{paymentDetails.reference}</Typography>
             </Box>
@@ -141,6 +146,11 @@ const Review: React.FC<ReviewProps> = ({
             variant="contained" 
             color="primary"
             onClick={handleViewOrders}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              maxWidth: { sm: 200 },
+              mx: { xs: 'auto', sm: 'unset' }
+            }}
           >
             View My Orders
           </Button>

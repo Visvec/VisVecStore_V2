@@ -8,7 +8,7 @@ import {
   FormControl,
   InputAdornment,
   Typography,
-  Box
+  Box,
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
@@ -48,18 +48,17 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
   const [form, setForm] = useState({
     email: '',
     phone: '',
-    provider: 'MTN'
+    provider: 'MTN',
   });
 
-  const mapCartItemsToOrderItems = (items: Item[]) => {
-    return items.map(item => ({
+  const mapCartItemsToOrderItems = (items: Item[]) =>
+    items.map((item) => ({
       productId: item.productId,
       name: item.name,
       quantity: item.quantity,
       price: item.price,
-      pictureUrl: item.pictureUrl
+      pictureUrl: item.pictureUrl,
     }));
-  };
 
   const subtotal = cart?.items.reduce((sum: number, item: Item) => sum + item.price * item.quantity, 0) ?? 0;
   const deliveryFee = subtotal > 10000 ? 0 : 500;
@@ -84,8 +83,8 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
           phone: form.phone,
           provider: form.provider,
           amount: totalAmountInPesewas,
-          shippingAddress
-        })
+          shippingAddress,
+        }),
       });
 
       const result = await response.json();
@@ -95,7 +94,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         email: form.email,
         phone: form.phone,
         provider: form.provider,
-        reference: result?.data?.reference || ''
+        reference: result?.data?.reference || '',
       };
 
       localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
@@ -113,7 +112,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
             total: subtotal + deliveryFee,
             shippingAddress,
             paymentDetails,
-            status: 'pending'
+            status: 'pending',
           };
 
           saveOrderToLocalStorage(order);
@@ -133,7 +132,7 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         amount: totalAmountInPesewas,
         email: form.email,
         phone: form.phone,
-        provider: form.provider
+        provider: form.provider,
       };
 
       localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
@@ -144,13 +143,23 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box
+      sx={{
+        maxWidth: 600,
+        width: '90%',
+        mx: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        p: { xs: 2, sm: 3 },
+      }}
+    >
       <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" gutterBottom>Shipping to:</Typography>
-        <Typography variant="body2">
-          {shippingAddress.hostel}, {shippingAddress.landmark}<br />
-          {shippingAddress.city}, {shippingAddress.region}<br />
-          Contact: {shippingAddress.contact}
+        <Typography variant="subtitle1" gutterBottom>
+          Shipping to:
+        </Typography>
+        <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+          {`${shippingAddress.hostel}, ${shippingAddress.landmark}\n${shippingAddress.city}, ${shippingAddress.region}\nContact: ${shippingAddress.contact}`}
         </Typography>
       </Box>
 
@@ -160,6 +169,8 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
         value={form.email}
         onChange={handleInputChange}
         fullWidth
+        type="email"
+        autoComplete="email"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -167,13 +178,21 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
             </InputAdornment>
           ),
         }}
+        sx={{
+          '& .MuiInputBase-input': {
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+          },
+        }}
       />
+
       <TextField
         label="Phone Number"
         name="phone"
         value={form.phone}
         onChange={handleInputChange}
         fullWidth
+        type="tel"
+        autoComplete="tel"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -181,7 +200,13 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
             </InputAdornment>
           ),
         }}
+        sx={{
+          '& .MuiInputBase-input': {
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+          },
+        }}
       />
+
       <FormControl fullWidth>
         <InputLabel>Provider</InputLabel>
         <Select
@@ -189,25 +214,49 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
           value={form.provider}
           label="Provider"
           onChange={handleSelectChange}
+          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
         >
-          <MenuItem value="MTN">MTN</MenuItem>
-          <MenuItem value="VODAFONE">VODAFONE</MenuItem>
-          <MenuItem value="AIRTELTIGO">AIRTELTIGO</MenuItem>
+          <MenuItem value="MTN" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+            MTN
+          </MenuItem>
+          <MenuItem value="VODAFONE" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+            VODAFONE
+          </MenuItem>
+          <MenuItem value="AIRTELTIGO" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+            AIRTELTIGO
+          </MenuItem>
         </Select>
       </FormControl>
 
-      <Typography variant="body1">Total to be paid: GHS {totalAmount.toFixed(2)}</Typography>
+      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+        Total to be paid: GHS {totalAmount.toFixed(2)}
+      </Typography>
 
-      <Button variant="contained" color="primary" onClick={handlePay}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handlePay}
+        sx={{
+          py: { xs: 1.2, sm: 1.5 },
+          fontSize: { xs: '1rem', sm: '1.1rem' },
+        }}
+      >
         Pay with Mobile Money
       </Button>
 
       <Typography
         variant="caption"
-        sx={{ mt: 2, color: 'text.secondary', fontStyle: 'italic', textAlign: 'center' }}
+        sx={{
+          mt: 2,
+          color: 'text.secondary',
+          fontStyle: 'italic',
+          textAlign: 'center',
+          fontSize: { xs: '0.75rem', sm: '0.85rem' },
+          whiteSpace: 'pre-line',
+        }}
       >
-        Payment confirmation is processed securely via Paystack webhook.<br />
-        Your order status will update automatically once payment is confirmed.
+        Payment confirmation is processed securely via Paystack webhook.
+        {'\n'}Your order status will update automatically once payment is confirmed.
       </Typography>
     </Box>
   );

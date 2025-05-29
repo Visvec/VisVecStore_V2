@@ -55,10 +55,31 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-      <Typography variant="h6" gutterBottom>Shipping Address</Typography>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        maxWidth: { xs: '90%', sm: 480, md: 600 }, // wider on larger screens
+        mx: 'auto',
+        mt: 4,
+        px: { xs: 2, sm: 3 }, // horizontal padding for small devices
+      }}
+    >
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' }, textAlign: 'center' }}
+      >
+        Shipping Address
+      </Typography>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <TextField
           label="Hostel"
           variant="outlined"
@@ -67,6 +88,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           name="hostel"
           value={address.hostel}
           onChange={handleChange}
+          inputProps={{ style: { fontSize: '1rem' } }}
         />
         <TextField
           label="Landmark"
@@ -76,6 +98,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           name="landmark"
           value={address.landmark}
           onChange={handleChange}
+          inputProps={{ style: { fontSize: '1rem' } }}
         />
         <TextField
           label="City"
@@ -85,6 +108,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           name="city"
           value={address.city}
           onChange={handleChange}
+          inputProps={{ style: { fontSize: '1rem' } }}
         />
         <TextField
           label="Active Contact Number"
@@ -94,6 +118,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           name="contact"
           value={address.contact}
           onChange={handleChange}
+          inputProps={{ style: { fontSize: '1rem' } }}
         />
         <TextField
           label="Region"
@@ -103,6 +128,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           name="region"
           value={address.region}
           onChange={handleChange}
+          inputProps={{ style: { fontSize: '1rem' } }}
         />
 
         <Button
@@ -110,7 +136,11 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
           variant="contained"
           color="primary"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 2,
+            fontSize: { xs: '1rem', sm: '1.125rem' },
+            py: { xs: 1.5, sm: 2 },
+          }}
         >
           Continue to Payment
         </Button>

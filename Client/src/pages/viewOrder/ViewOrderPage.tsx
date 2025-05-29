@@ -1,4 +1,3 @@
-// pages/viewOrder/ViewOrderPage.tsx
 import { Box, Button, Divider, Typography } from '@mui/material';
 import { useRef } from 'react';
 import OrderDetails from '../../components/viewOrder/OrderDetails';
@@ -14,19 +13,42 @@ const ViewOrderPage = () => {
   });
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3, md: 4 },
+        maxWidth: 'lg',
+        mx: 'auto',
+        width: '100%',
+      }}
+    >
       <Typography variant="h5" gutterBottom>
         Order Receipt
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
-      <Box ref={printRef}>
+      <Box
+        ref={printRef}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 2, md: 4 },
+          // Ensure children stretch full width on small screens and share space on larger screens
+          '& > *': {
+            flex: { xs: 'unset', md: 1 },
+            width: { xs: '100%', md: 'auto' },
+          },
+        }}
+      >
         <ShippingDetails />
         <OrderDetails />
         <PaymentDetails />
       </Box>
 
-      <Button variant="contained" onClick={handlePrint} sx={{ mt: 3 }}>
+      <Button
+        variant="contained"
+        onClick={handlePrint}
+        sx={{ mt: 3, width: { xs: '100%', sm: 'auto' } }}
+      >
         Print Receipt
       </Button>
     </Box>
