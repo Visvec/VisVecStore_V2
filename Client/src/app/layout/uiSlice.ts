@@ -1,4 +1,3 @@
-import { DarkMode } from "@mui/icons-material";
 import { createSlice } from "@reduxjs/toolkit";
 
 const getInitialDarkMode = () => {

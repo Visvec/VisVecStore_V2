@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import { Grid } from "@mui/material"
 import ProductCard from "./ProductCard"
 import { Product } from "../../app/models/product"
 

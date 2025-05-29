@@ -17,6 +17,17 @@ public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(op
     {
         base.OnModelCreating(builder);
         builder.Entity<Order>().OwnsOne(o => o.ShippingAddress);
+        builder.Entity<Order>()
+        .Property(o => o.Subtotal)
+        .HasPrecision(18, 2);
+
+        builder.Entity<Order>()
+            .Property(o => o.DeliveryFee)
+            .HasPrecision(18, 2);
+
+        builder.Entity<OrderItem>()
+            .Property(oi => oi.Price)
+            .HasPrecision(18, 2);
 
         builder.Entity<IdentityRole>()
                 .HasData(
