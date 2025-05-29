@@ -5,11 +5,15 @@ import {
   Avatar,
   Divider,
   Paper,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useGetProfileQuery } from "../account/accountApi";
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error } = useGetProfileQuery();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   let localShippingAddress = null;
   if (profile?.email) {
@@ -34,22 +38,40 @@ export default function ProfilePage() {
   }
 
   const InfoRow = ({ label, value }: { label: string; value?: string | null }) => (
-    <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-      <Typography fontWeight={500} color="textSecondary" sx={{ flexBasis: '40%' }}>
+    <Box
+      display="flex"
+      flexDirection={isMobile ? "column" : "row"}
+      justifyContent="space-between"
+      alignItems={isMobile ? "flex-start" : "center"}
+      sx={{ mb: 1 }}
+    >
+      <Typography
+        fontWeight={500}
+        color="textSecondary"
+        sx={{ flexBasis: isMobile ? '100%' : '40%', mb: isMobile ? 0.5 : 0 }}
+      >
         {label}
       </Typography>
-      <Typography sx={{ flexBasis: '55%', textAlign: 'right' }}>
+      <Typography
+        sx={{
+          flexBasis: isMobile ? '100%' : '55%',
+          textAlign: isMobile ? 'left' : 'right',
+        }}
+      >
         {value || "-"}
       </Typography>
     </Box>
   );
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 2 }}>
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
-        <Box display="flex" alignItems="center" mb={2}>
-          <Avatar src={profile.profilePhoto || ""} sx={{ width: 50, height: 50, mr: 2 }} />
-          <Typography variant="h6">
+    <Container maxWidth="sm" sx={{ mt: 2, px: { xs: 2, sm: 3, md: 4 } }}>
+      <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+        <Box display="flex" flexDirection={isMobile ? "column" : "row"} alignItems="center" mb={2}>
+          <Avatar
+            src={profile.profilePhoto || ""}
+            sx={{ width: 60, height: 60, mb: isMobile ? 1 : 0, mr: isMobile ? 0 : 2 }}
+          />
+          <Typography variant={isMobile ? "h6" : "h5"} textAlign={isMobile ? "center" : "left"}>
             {profile.firstName} {profile.lastName}
           </Typography>
         </Box>
@@ -76,9 +98,7 @@ export default function ProfilePage() {
           </>
         )}
 
-        <Box display="flex" justifyContent="center" mt={2}>
-         
-        </Box>
+        <Box display="flex" justifyContent="center" mt={2}></Box>
       </Paper>
     </Container>
   );

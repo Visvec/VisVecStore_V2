@@ -1,117 +1,237 @@
-import { DarkMode, LightMode, ShoppingCart } from "@mui/icons-material";
-import { AppBar, Badge, Box, IconButton, LinearProgress, List, ListItem, Toolbar, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  DarkMode,
+  LightMode,
+  ShoppingCart,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
+import {
+  AppBar,
+  Badge,
+  Box,
+  IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  Toolbar,
+  Typography,
+  Drawer,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { setDarkMode } from "./uiSlice";
 import { useFetchCartQuery } from "../../features/cart/cartApi";
 import UserMenu from "./UserMenu";
 import { useUserInfoQuery } from "../../features/account/accountApi";
-import VisVec_Logo from '../../LOGO/VisVec_Logo.png'; // adjust path as needed
+import VisVec_Logo from "../../LOGO/VisVec_Logo.png";
 
 const midLinks = [
-  { title: 'catalog', path: '/catalog' },
-  { title: 'about', path: '/about' },
-  { title: 'contact', path: '/contact' },
-]
+  { title: "catalog", path: "/catalog" },
+  { title: "about", path: "/about" },
+  { title: "contact", path: "/contact" },
+];
 const rightLinks = [
-  { title: 'login', path: '/login' },
-  { title: 'register', path: '/register' },
-]
+  { title: "login", path: "/login" },
+  { title: "register", path: "/register" },
+];
 const navStyles = {
-
-  color: 'inherit',
-  typography: 'h6',
-  textDecoration: 'none',
-  '&:hover': {
-    color: 'grey.500'
+  color: "inherit",
+  typography: "h6",
+  textDecoration: "none",
+  "&:hover": {
+    color: "grey.500",
   },
-  '&.active': {
-    color: '#baecf9'
-  }
-
-}
+  "&.active": {
+    color: "#baecf9",
+  },
+};
 
 export default function NavBar() {
   const { data: user } = useUserInfoQuery();
-  const { isLoading, darkMode } = useAppSelector(state => state.ui);
+  const { isLoading, darkMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
   const { data: cart } = useFetchCartQuery();
 
   const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
-  return (
-    <AppBar position="fixed">
-      <Toolbar sx={{ disply: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box display='flex' alignItems='center'>
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-            <Box display="flex" alignItems="center" gap={1}>
-  <Box
-    component="img"
-    src={VisVec_Logo}
-    alt="Logo"
-    style={{ width: '40px', height: '40px', marginTop: '2px' }}
-  />
-  <Typography
-    component={NavLink}
-    sx={navStyles}
-    to="/"
-    variant="h6"
-  >
-    VISVEC Store
-  </Typography>
-</Box>
-          <IconButton onClick={() => dispatch(setDarkMode())}>
-            {darkMode ? <DarkMode /> : <LightMode sx={{ color: 'yellow' }} />}
-          </IconButton>
-        </Box>
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-        <List sx={{ display: 'flex' }}>
-          {midLinks.map(({ title, path }) => (
+  const handleDrawerToggle = () => {
+    setDrawerOpen((prev) => !prev);
+  };
+
+  const drawerContent = (
+    <Box
+      sx={{ width: 250 }}
+      role="presentation"
+      onClick={() => setDrawerOpen(false)}
+      onKeyDown={() => setDrawerOpen(false)}
+    >
+      <List>
+        {midLinks.map(({ title, path }) => (
+          <ListItem
+            key={path}
+            component={NavLink}
+            to={path}
+            sx={{ ...navStyles, display: "block", padding: "8px 16px" }}
+          >
+            {title.toUpperCase()}
+          </ListItem>
+        ))}
+      </List>
+
+      {user ? (
+        <UserMenu user={user} />
+      ) : (
+        <List>
+          {rightLinks.map(({ title, path }) => (
             <ListItem
+              key={path}
               component={NavLink}
               to={path}
-              key={path}
-              sx={navStyles}
+              sx={{ ...navStyles, display: "block", padding: "8px 16px" }}
             >
               {title.toUpperCase()}
             </ListItem>
           ))}
         </List>
+      )}
+    </Box>
+  );
 
-        <Box display='flex' alignItems='center'>
-          <IconButton component={Link} to='/cart' size="large" sx={{ color: 'inherit' }}>
-            <Badge badgeContent={itemCount} color="secondary">
-              <ShoppingCart />
-            </Badge>
+  return (
+    <>
+      <AppBar position="fixed">
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box
+              component="img"
+              src={VisVec_Logo}
+              alt="Logo"
+              sx={{ width: 40, height: 40, mt: "2px" }}
+            />
+            <Typography
+              component={NavLink}
+              to="/"
+              variant="h6"
+              sx={navStyles}
+              noWrap
+            >
+              VISVEC Store
+            </Typography>
+          </Box>
 
-          </IconButton>
+          {/* Desktop Menu */}
+          {!isMobile && (
+            <>
+              <List sx={{ display: "flex", gap: 2 }}>
+                {midLinks.map(({ title, path }) => (
+                  <ListItem
+                    key={path}
+                    component={NavLink}
+                    to={path}
+                    sx={navStyles}
+                  >
+                    {title.toUpperCase()}
+                  </ListItem>
+                ))}
+              </List>
 
-          {user ? (
-            <UserMenu user={user} />
-          ) : (
-            <List sx={{ display: 'flex' }}>
-              {rightLinks.map(({ title, path }) => (
-                <ListItem
-                  component={NavLink}
-                  to={path}
-                  key={path}
-                  sx={navStyles}
+              <Box display="flex" alignItems="center" gap={1}>
+                <IconButton onClick={() => dispatch(setDarkMode())} color="inherit">
+                  {darkMode ? <DarkMode /> : <LightMode sx={{ color: "yellow" }} />}
+                </IconButton>
+
+                <IconButton
+                  component={Link}
+                  to="/cart"
+                  size="large"
+                  sx={{ color: "inherit" }}
                 >
-                  {title.toUpperCase()}
-                </ListItem>
-              ))}
-            </List>
+                  <Badge badgeContent={itemCount} color="secondary">
+                    <ShoppingCart />
+                  </Badge>
+                </IconButton>
+
+                {user ? (
+                  <UserMenu user={user} />
+                ) : (
+                  <List sx={{ display: "flex", gap: 2 }}>
+                    {rightLinks.map(({ title, path }) => (
+                      <ListItem
+                        key={path}
+                        component={NavLink}
+                        to={path}
+                        sx={navStyles}
+                      >
+                        {title.toUpperCase()}
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
+            </>
           )}
 
-        </Box>
+          {/* Mobile Menu Icon */}
+          {isMobile && (
+            <Box display="flex" alignItems="center" gap={1}>
+              <IconButton onClick={() => dispatch(setDarkMode())} color="inherit">
+                {darkMode ? <DarkMode /> : <LightMode sx={{ color: "yellow" }} />}
+              </IconButton>
 
-      </Toolbar>
+              <IconButton
+                component={Link}
+                to="/cart"
+                size="large"
+                sx={{ color: "inherit" }}
+              >
+                <Badge badgeContent={itemCount} color="secondary">
+                  <ShoppingCart />
+                </Badge>
+              </IconButton>
 
-      {isLoading && (
-        <Box sx={{ width: '100%' }}>
-          <LinearProgress color="secondary" />
-        </Box>
-      )}
-    </AppBar>
-  )
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleDrawerToggle}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
+          )}
+        </Toolbar>
+
+        {isLoading && (
+          <Box sx={{ width: "100%" }}>
+            <LinearProgress color="secondary" />
+          </Box>
+        )}
+      </AppBar>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+    </>
+  );
 }

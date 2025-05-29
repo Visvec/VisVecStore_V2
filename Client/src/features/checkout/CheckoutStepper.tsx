@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Step, StepLabel, Stepper } from "@mui/material";
+import { Box, Button, Paper, Step, StepLabel, Stepper, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import PaystackCheckout from "../payment/PaystackCheckout";
 import ShippingAddressForm from "../payment/ShippingAddressForm";
@@ -46,6 +46,9 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
 
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | 'pending'>('pending');
 
+  const theme = useTheme();
+  const isSmDown = useMediaQuery(theme.breakpoints.down('sm')); // For small devices
+
   useEffect(() => {
     onStepChange(activeStep);
   }, [activeStep, onStepChange]);
@@ -76,53 +79,54 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
   };
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 3 }}>
-      <Stepper activeStep={activeStep}>
+    <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, maxWidth: 600, mx: 'auto' }}>
+      <Stepper activeStep={activeStep} orientation={isSmDown ? 'vertical' : 'horizontal'} sx={{ mb: 3 }}>
         {steps.map((label, index) => (
-          <Step key={index}>
+          <Step key={index} completed={activeStep > index}>
             <StepLabel>{label}</StepLabel>
           </Step>
         ))}
       </Stepper>
 
-      <Box sx={{ mt: 2 }}>
-        <Box sx={{ display: activeStep === 0 ? 'block' : 'none' }}>
+      <Box sx={{ minHeight: 300 }}>
+        {activeStep === 0 && (
           <ShippingAddressForm onAddressSubmit={handleAddressSubmit} handleNext={function (): void {
             throw new Error("Function not implemented.");
           } } />
-        </Box>
-        <Box sx={{ display: activeStep === 1 ? 'block' : 'none' }}>
+        )}
+        {activeStep === 1 && (
           <PaystackCheckout 
             handleNext={handlePaymentComplete} 
             shippingAddress={shippingAddress}
-          /> 
-        </Box>
-        <Box sx={{ display: activeStep === 2 ? 'block' : 'none' }}>
+          />
+        )}
+        {activeStep === 2 && (
           <Review
             paymentStatus={paymentStatus}
             shippingAddress={shippingAddress}
             paymentDetails={paymentDetails}
             onTryAgain={handleTryAgain}
           />
-        </Box>
+        )}
       </Box>
 
-      <Box display="flex" paddingTop={2} justifyContent="space-between">
-        <Button 
-          onClick={handleBack} 
-          disabled={activeStep === 0 || activeStep === steps.length - 1}
+      <Box
+        display="flex"
+        flexDirection={isSmDown ? 'column' : 'row'}
+        justifyContent="space-between"
+        gap={isSmDown ? 1 : 0}
+        pt={2}
+      >
+        <Button
+          onClick={handleBack}
+          disabled={activeStep === 0 || paymentStatus === 'success'}
+          fullWidth={isSmDown}
+          variant="outlined"
         >
           Back
         </Button>
-        {activeStep !== 0 && activeStep !== 1 && activeStep !== 2 && (
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={handleNext}
-          >
-            {activeStep === steps.length - 1 ? 'Place Order' : 'Next'}
-          </Button>
-        )}
+
+        {/* Show Next or Place Order button only on relevant steps */}
       </Box>
     </Paper>
   );

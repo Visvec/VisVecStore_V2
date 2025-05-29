@@ -1,12 +1,20 @@
 import React, { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  useTheme,
+  Theme,
+} from '@mui/material';
 
 const ContactPage = () => {
   const form = useRef<HTMLFormElement | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const theme: Theme = useTheme();
 
   const sendEmail = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,13 +44,41 @@ const ContactPage = () => {
       });
   };
 
+  const textFieldCommonSx = {
+    backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#f5f5f5',
+    '& .MuiInputBase-input': {
+      color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+    },
+    '& .MuiInputLabel-root': {
+      color: theme.palette.mode === 'dark' ? '#ccc' : '#000',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#777' : '#ccc',
+      },
+      '&:hover fieldset': {
+        borderColor: theme.palette.primary.main,
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: theme.palette.primary.main,
+      },
+    },
+  };
+
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 4 } }}>
       <Typography variant="h5" mb={3}>
         Contact Us
       </Typography>
 
-      <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 4,
+          flexWrap: 'wrap',
+        }}
+      >
         {/* Contact Information Box */}
         <Box sx={{ flex: 1, minWidth: '280px' }}>
           <Typography variant="h6" mb={2}>
@@ -51,9 +87,10 @@ const ContactPage = () => {
           <TextField
             fullWidth
             label="Phone"
-            value="+233556696690/ +233551163918"
+            value="+233556696690 / +233551163918"
             InputProps={{ readOnly: true }}
             margin="normal"
+            sx={textFieldCommonSx}
           />
           <TextField
             fullWidth
@@ -61,6 +98,7 @@ const ContactPage = () => {
             value="visvec2025@gmail.com"
             InputProps={{ readOnly: true }}
             margin="normal"
+            sx={textFieldCommonSx}
           />
           <TextField
             fullWidth
@@ -68,6 +106,7 @@ const ContactPage = () => {
             value="Monday to Friday - 9 AM to 5 PM"
             InputProps={{ readOnly: true }}
             margin="normal"
+            sx={textFieldCommonSx}
           />
         </Box>
 
@@ -86,7 +125,7 @@ const ContactPage = () => {
               label="Your Name"
               margin="normal"
               required
-              sx={{ backgroundColor: '#fff' }}
+              sx={textFieldCommonSx}
             />
             <TextField
               fullWidth
@@ -95,7 +134,7 @@ const ContactPage = () => {
               type="email"
               margin="normal"
               required
-              sx={{ backgroundColor: '#fff' }}
+              sx={textFieldCommonSx}
             />
             <TextField
               fullWidth
@@ -103,7 +142,7 @@ const ContactPage = () => {
               label="Location"
               margin="normal"
               required
-              sx={{ backgroundColor: '#fff' }}
+              sx={textFieldCommonSx}
             />
             <TextField
               fullWidth
@@ -113,7 +152,7 @@ const ContactPage = () => {
               rows={6}
               margin="normal"
               required
-              sx={{ backgroundColor: '#fff' }}
+              sx={textFieldCommonSx}
             />
             <Button
               type="submit"
