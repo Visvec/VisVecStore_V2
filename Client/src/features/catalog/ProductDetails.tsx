@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -43,9 +44,14 @@ export default function ProductDetails() {
     }
   };
 
+  // Updated to handle text input but maintain number functionality
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = +event.currentTarget.value;
-    if (value >= 0) setQuantity(value);
+    const value = event.currentTarget.value;
+    // Only allow numbers and empty string
+    if (value === '' || /^\d+$/.test(value)) {
+      const numValue = value === '' ? 0 : +value;
+      if (numValue >= 0) setQuantity(numValue);
+    }
   };
 
   const productDetails = [
@@ -117,22 +123,38 @@ export default function ProductDetails() {
           alignItems="center"
         >
           <Box flex={1}>
-            <TextField
-              variant="outlined"
-              type="number"
-              label="Quantity in cart"
-              fullWidth
-              value={quantity}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 0
-                }
-              }}
-            />
-
-
-
+            <Box display="flex" alignItems="center" gap={1}>
+              <IconButton 
+                onClick={() => setQuantity(Math.max(0, quantity - 1))}
+                size="small"
+                disabled={quantity <= 0}
+              >
+                -
+              </IconButton>
+              
+              <TextField
+                variant="outlined"
+                type="text"
+                label="Quantity in cart"
+                fullWidth
+                value={quantity}
+                onChange={handleInputChange}
+                slotProps={{
+                  htmlInput: {
+                    inputMode: 'numeric',
+                    pattern: '[0-9]*',
+                    style: { textAlign: 'center' }
+                  }
+                }}
+              />
+              
+              <IconButton 
+                onClick={() => setQuantity(quantity + 1)}
+                size="small"
+              >
+                +
+              </IconButton>
+            </Box>
           </Box>
 
           <Box flex={1}>
