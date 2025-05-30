@@ -88,7 +88,7 @@ const ContactPage = () => {
             fullWidth
             label="Phone"
             value="+233556696690 / +233551163918"
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
             margin="normal"
             sx={textFieldCommonSx}
           />
@@ -96,7 +96,7 @@ const ContactPage = () => {
             fullWidth
             label="Email"
             value="visvec2025@gmail.com"
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
             margin="normal"
             sx={textFieldCommonSx}
           />
@@ -104,7 +104,7 @@ const ContactPage = () => {
             fullWidth
             label="Working Hours"
             value="Monday to Friday - 9 AM to 5 PM"
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
             margin="normal"
             sx={textFieldCommonSx}
           />
@@ -116,7 +116,7 @@ const ContactPage = () => {
             Send a Message
           </Typography>
           <Typography variant="body2" color="error" fontStyle="italic" mb={2}>
-            If your message fails to send, please feel free to contact us via the phone numbers or email listed on the left.
+            If your message fails to send, please feel free to reach out to us using the contact details provided on the page.
           </Typography>
           <form ref={form} onSubmit={sendEmail}>
             <TextField

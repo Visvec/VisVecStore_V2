@@ -124,8 +124,15 @@ export default function ProductDetails() {
               fullWidth
               value={quantity}
               onChange={handleInputChange}
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: {
+                  min: 0
+                }
+              }}
             />
+
+
+
           </Box>
 
           <Box flex={1}>
