@@ -10,8 +10,6 @@ import {
   Typography,
   TextField,
   Button,
-  InputLabel,
-  FormControl,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
@@ -21,9 +19,9 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     setError,
-    formState: { errors, isValid, isLoading },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterSchema>({
-    mode: "onTouched",
+    mode: "onSubmit", // Changed to onSubmit to prevent premature validation
     resolver: zodResolver(registerSchema),
   });
 
@@ -89,20 +87,18 @@ export default function RegisterForm() {
               helperText={errors.lastName?.message}
             />
 
-            {/* Date of Birth using FormControl for better flexibility */}
-            <FormControl fullWidth>
-              <InputLabel shrink htmlFor="dateOfBirth">
-                Date of Birth
-              </InputLabel>
-              <TextField
-                fullWidth
-                id="dateOfBirth"
-                type="date"
-                {...register("dateOfBirth")}
-                error={!!errors.dateOfBirth}
-                helperText={errors.dateOfBirth?.message}
-              />
-            </FormControl>
+            {/* Fixed Date of Birth field */}
+            <TextField
+              fullWidth
+              label="Date of Birth"
+              type="date"
+              {...register("dateOfBirth")}
+              error={!!errors.dateOfBirth}
+              helperText={errors.dateOfBirth?.message}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
 
             <TextField
               fullWidth
@@ -123,11 +119,11 @@ export default function RegisterForm() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading || !isValid}
+              disabled={isSubmitting}
               fullWidth
               sx={{ py: 1.5 }}
             >
-              Register
+              {isSubmitting ? "Registering..." : "Register"}
             </Button>
 
             <Typography textAlign="center" variant="body2" mt={2}>
