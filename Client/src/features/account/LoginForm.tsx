@@ -15,16 +15,32 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm<loginSchema>({
-    mode: "onTouched",
+    mode: "onSubmit", // Changed from "onTouched" to "onSubmit"
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: loginSchema) => {
-    await login(data);
-    await fetchuserInfo();
-    navigate(location.state?.from || "/catalog");
+    try {
+      await login(data).unwrap();
+      await fetchuserInfo();
+      navigate(location.state?.from || "/catalog");
+    } catch (error) {
+      // Handle login errors
+      const apiError = error as { message?: string; data?: { message?: string } };
+      const errorMessage = apiError.data?.message || apiError.message || "Login failed";
+      
+      if (errorMessage.toLowerCase().includes("email") || errorMessage.toLowerCase().includes("user")) {
+        setError("email", { message: errorMessage });
+      } else if (errorMessage.toLowerCase().includes("password")) {
+        setError("password", { message: errorMessage });
+      } else {
+        // Generic error - show on email field
+        setError("email", { message: errorMessage });
+      }
+    }
   };
 
   return (
@@ -97,13 +113,13 @@ export default function LoginForm() {
             size="medium"
           />
           <Button
-            disabled={isLoading}
+            disabled={isSubmitting || isLoading}
             variant="contained"
             type="submit"
             size="large"
             sx={{ py: 1.5, fontWeight: "bold" }}
           >
-            Sign in
+            {isSubmitting || isLoading ? "Signing in..." : "Sign in"}
           </Button>
 
           <Typography
