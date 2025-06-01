@@ -1,6 +1,7 @@
 using API.Data;
 using API.Entities;
 using API.MiddleWare;
+using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,7 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 
 // 👇 Register HttpClient for PaymentController
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

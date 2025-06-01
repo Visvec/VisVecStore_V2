@@ -12,6 +12,7 @@ import {
   Button,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function RegisterForm() {
   const [registerUser] = useRegisterMutation();
@@ -21,13 +22,14 @@ export default function RegisterForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterSchema>({
-    mode: "onSubmit", // Changed to onSubmit to prevent premature validation
+    mode: "onSubmit",
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
       await registerUser(data).unwrap();
+      toast.success("Registration successful! Check your email to confirm your account.");
     } catch (error) {
       const apiError = error as { message: string };
       if (apiError.message && typeof apiError.message === "string") {
@@ -40,6 +42,8 @@ export default function RegisterForm() {
             setError("email", { message: e });
           }
         });
+      } else {
+        toast.error("Registration failed. Please try again.");
       }
     }
   };
@@ -86,8 +90,6 @@ export default function RegisterForm() {
               error={!!errors.lastName}
               helperText={errors.lastName?.message}
             />
-
-            {/* Fixed Date of Birth field */}
             <TextField
               fullWidth
               label="Date of Birth"
@@ -99,7 +101,6 @@ export default function RegisterForm() {
                 shrink: true,
               }}
             />
-
             <TextField
               fullWidth
               label="Password"

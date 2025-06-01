@@ -1,14 +1,16 @@
 import { LockOutlined } from "@mui/icons-material";
-import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, TextField, Typography, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginSchema } from "../../lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLazyUserInfoQuery, useLoginMutation } from "./accountApi";
+import { useState } from "react";
 
 export default function LoginForm() {
   const [login, { isLoading }] = useLoginMutation();
   const [fetchuserInfo] = useLazyUserInfoQuery();
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,22 +18,44 @@ export default function LoginForm() {
     register,
     handleSubmit,
     setError,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<loginSchema>({
-    mode: "onSubmit", // Changed from "onTouched" to "onSubmit"
+    mode: "onSubmit",
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: loginSchema) => {
     try {
+      // Reset email confirmation state
+      setEmailNotConfirmed(false);
+      
       await login(data).unwrap();
       await fetchuserInfo();
       navigate(location.state?.from || "/catalog");
     } catch (error) {
       // Handle login errors
-      const apiError = error as { message?: string; data?: { message?: string } };
+      const apiError = error as { 
+        message?: string; 
+        data?: { message?: string; title?: string }; 
+        status?: number;
+      };
+      
       const errorMessage = apiError.data?.message || apiError.message || "Login failed";
       
+      // Check if error is related to email confirmation
+      if (
+        errorMessage.toLowerCase().includes("email") && 
+        (errorMessage.toLowerCase().includes("confirm") || 
+         errorMessage.toLowerCase().includes("verify") ||
+         errorMessage.toLowerCase().includes("not confirmed") ||
+         errorMessage.toLowerCase().includes("unverified"))
+      ) {
+        setEmailNotConfirmed(true);
+        return;
+      }
+      
+      // Handle other login errors
       if (errorMessage.toLowerCase().includes("email") || errorMessage.toLowerCase().includes("user")) {
         setError("email", { message: errorMessage });
       } else if (errorMessage.toLowerCase().includes("password")) {
@@ -40,6 +64,36 @@ export default function LoginForm() {
         // Generic error - show on email field
         setError("email", { message: errorMessage });
       }
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    const email = getValues("email");
+    if (!email) {
+      setError("email", { message: "Please enter your email address first" });
+      return;
+    }
+
+    try {
+      // You might want to create a separate API endpoint for resending confirmation
+      // For now, this is a placeholder - you'll need to implement this endpoint
+      const response = await fetch('/api/account/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        // Show success message or handle accordingly
+        alert('Confirmation email sent! Please check your inbox.');
+      } else {
+        alert('Error sending confirmation email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error resending confirmation:', error);
+      alert('Error sending confirmation email. Please try again.');
     }
   };
 
@@ -59,7 +113,6 @@ export default function LoginForm() {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        // Responsive width with maxWidth and width
         sx={{
           width: "100%",
           maxWidth: 400,
@@ -85,6 +138,26 @@ export default function LoginForm() {
         >
           Sign in
         </Typography>
+
+        {emailNotConfirmed && (
+          <Alert 
+            severity="warning" 
+            sx={{ mb: 3, width: "100%" }}
+            action={
+              <Button 
+                color="inherit" 
+                size="small" 
+                onClick={handleResendConfirmation}
+              >
+                Resend
+              </Button>
+            }
+          >
+            <Typography variant="body2">
+              Please confirm your email address before signing in. Check your inbox for the confirmation email.
+            </Typography>
+          </Alert>
+        )}
 
         <Box
           component="form"
