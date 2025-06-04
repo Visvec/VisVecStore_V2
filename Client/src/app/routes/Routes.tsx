@@ -16,6 +16,7 @@ import OrderList from "../../components/viewOrder/OrderList";
 import OrderDetails from "../../components/viewOrder/OrderDetails";
 import ProfilePage from "../../features/profile/ProfilePage";
 import ConfirmEmail from "../../features/confirmation/ConfirmEmail";
+import OAuthSuccess from "../../features/confirmation/OAuthSuccess";
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
             {path: 'login', element: <LoginForm/>},
             {path: 'register', element: <RegisterForm/>},
             {path: 'confirm-email', element: <ConfirmEmail />},
+            {path: 'oauth-success', element: <OAuthSuccess />},
             {path: 'not-found', element: <NotFound/>},
             {path: '*', element: <Navigate replace to='/not-found'/>}
         ]

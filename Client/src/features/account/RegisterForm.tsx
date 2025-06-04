@@ -138,6 +138,15 @@ export default function RegisterForm() {
                 Sign in here
               </Typography>
             </Typography>
+            <Button
+  variant="outlined"
+  fullWidth
+  onClick={() => {
+    window.location.href = "https://localhost:5001/api/oauth/external-login";
+  }}
+>
+  Sign up with Google
+</Button>
           </Box>
         </Box>
       </Paper>
