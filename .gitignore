@@ -103,7 +103,8 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
-*.json
+*.Development.json
+*.Production.json
 
 # Chutzpah Test files
 _Chutzpah*
@@ -499,4 +500,5 @@ API/appsettings.Production.json
 API/appsettings.Development.json
 API/appsettings.Development.json
 API/appsettings.Production.json
+API/appsettings.Development.json
 API/appsettings.Development.json
