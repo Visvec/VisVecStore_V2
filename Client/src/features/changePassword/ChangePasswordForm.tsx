@@ -65,7 +65,7 @@ export default function ChangePasswordForm() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || `Password must be at least 6 characters with special characters,numbers, an uppercase letter and a lowercase letter: ${response.status}`);
       }
 
       const responseData = await response.json();

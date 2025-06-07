@@ -11,7 +11,7 @@ export default defineConfig({
   },
   server: {
      port: 3000,
-      https: true, // optional: enable only if you want HTTPS
+      https: {}, // optional: enable only if you want HTTPS
   },
   plugins: [react(), mkcert()],
 })

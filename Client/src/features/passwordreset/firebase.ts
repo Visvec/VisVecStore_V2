@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAmAsCxLYkZwBsn7Q69e3pyP7vbK25PXMA",
-  authDomain: "myappauth12345.firebaseapp.com",
-  projectId: "myappauth12345",
-  storageBucket: "myappauth12345.firebasestorage.app",
-  messagingSenderId: "239421868374",
-  appId: "1:239421868374:web:101564165b17448714aef7"
+  apiKey: "AIzaSyCZcxX4F8tjW-wCHmJ3rlb6tYXWrJyzxY4",
+  authDomain: "visvec-store.firebaseapp.com",
+  projectId: "visvec-store",
+  storageBucket: "visvec-store.firebasestorage.app",
+  messagingSenderId: "189015916790",
+  appId: "1:189015916790:web:9015629bb8cb1d16c9ecd7"
 };
 
 const app = initializeApp(firebaseConfig);
