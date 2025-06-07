@@ -28,7 +28,7 @@ export default function ForgotPassword() {
 
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessage(" Password reset email sent. Check your inbox.");
+      setMessage("Password reset email sent. Check your inbox.");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Error sending reset email.");
@@ -44,10 +44,11 @@ export default function ForgotPassword() {
       maxWidth="sm"
       sx={{
         borderRadius: 3,
-        mt: { xs: 3, sm: 6 },
-        px: { xs: 2, sm: 4 },
+        mt: { xs: 4, sm: 6 },
+        px: { xs: 2, sm: 4, md: 6 },
         py: { xs: 4, sm: 6 },
         boxShadow: 3,
+        mx: "auto",
       }}
     >
       <Box
@@ -56,7 +57,7 @@ export default function ForgotPassword() {
         alignItems="center"
         sx={{
           width: "100%",
-          maxWidth: 400,
+          maxWidth: { xs: "100%", sm: 400 },
           mx: "auto",
         }}
       >
@@ -72,9 +73,10 @@ export default function ForgotPassword() {
           component="h1"
           sx={{
             mb: 3,
-            fontSize: { xs: "1.5rem", sm: "2rem" },
+            fontSize: { xs: "1.4rem", sm: "1.8rem", md: "2rem" },
             fontWeight: "bold",
             textAlign: "center",
+            lineHeight: 1.2,
           }}
         >
           Forgot your password?
@@ -89,7 +91,7 @@ export default function ForgotPassword() {
           width="100%"
           display="flex"
           flexDirection="column"
-          gap={3}
+          gap={2.5}
         >
           <TextField
             fullWidth
@@ -99,13 +101,19 @@ export default function ForgotPassword() {
             onChange={(e) => setEmail(e.target.value)}
             error={!!error}
             helperText={error || ""}
+            size="medium"
           />
 
           <Button
             variant="contained"
             type="submit"
             size="large"
-            sx={{ py: 1.5, fontWeight: "bold" }}
+            sx={{
+              py: 1.5,
+              fontWeight: "bold",
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+            }}
+            fullWidth
           >
             Send Reset Link
           </Button>
@@ -113,7 +121,11 @@ export default function ForgotPassword() {
           {message && (
             <Typography
               color="success.main"
-              sx={{ textAlign: "center", fontSize: "0.95rem", mt: 1 }}
+              sx={{
+                textAlign: "center",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                mt: 1,
+              }}
             >
               {message}
             </Typography>
