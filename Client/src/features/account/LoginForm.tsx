@@ -1,5 +1,15 @@
-import { LockOutlined } from "@mui/icons-material";
-import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { useState } from "react"; // <-- add this import
+import { LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  TextField,
+  Typography,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginSchema } from "../../lib/schemas/loginSchema";
@@ -12,13 +22,16 @@ export default function LoginForm() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // New state for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<loginSchema>({
-    mode: "onSubmit", // Changed from "onTouched" to "onSubmit"
+    mode: "onSubmit",
     resolver: zodResolver(loginSchema),
   });
 
@@ -28,16 +41,17 @@ export default function LoginForm() {
       await fetchuserInfo();
       navigate(location.state?.from || "/catalog");
     } catch (error) {
-      // Handle login errors
       const apiError = error as { message?: string; data?: { message?: string } };
       const errorMessage = apiError.data?.message || apiError.message || "Login failed";
-      
-      if (errorMessage.toLowerCase().includes("email") || errorMessage.toLowerCase().includes("user")) {
+
+      if (
+        errorMessage.toLowerCase().includes("email") ||
+        errorMessage.toLowerCase().includes("user")
+      ) {
         setError("email", { message: errorMessage });
       } else if (errorMessage.toLowerCase().includes("password")) {
         setError("password", { message: errorMessage });
       } else {
-        // Generic error - show on email field
         setError("email", { message: errorMessage });
       }
     }
@@ -59,7 +73,6 @@ export default function LoginForm() {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        // Responsive width with maxWidth and width
         sx={{
           width: "100%",
           maxWidth: 400,
@@ -106,11 +119,24 @@ export default function LoginForm() {
           <TextField
             fullWidth
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"} // toggle password visibility
             {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message}
             size="medium"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button
             disabled={isSubmitting || isLoading}
@@ -128,6 +154,14 @@ export default function LoginForm() {
               fontSize: { xs: "0.9rem", sm: "1rem" },
             }}
           >
+            <Typography
+              component={Link}
+              to="/forgot-password"
+              color="primary"
+              sx={{ display: "inline", fontWeight: "medium", mr: 2 }}
+            >
+              Forgot Password?
+            </Typography>
             Don't have an account?
             <Typography
               component={Link}
