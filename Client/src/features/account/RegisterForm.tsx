@@ -1,8 +1,8 @@
+import { useState } from "react"; // <-- add this import
 import { useForm } from "react-hook-form";
-import { useRegisterMutation } from "./accountApi";
 import { registerSchema, RegisterSchema } from "../../lib/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LockOutlined } from "@mui/icons-material";
+import { LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Container,
   Paper,
@@ -10,36 +10,69 @@ import {
   Typography,
   TextField,
   Button,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+// 🔐 Firebase imports
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
+// Backend mutation
+import { useRegisterMutation } from "./accountApi";
+import { auth } from "../passwordreset/firebase";
 
 export default function RegisterForm() {
   const [registerUser] = useRegisterMutation();
+  const navigate = useNavigate();
+
+  // New state for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterSchema>({
-    mode: "onSubmit", // Changed to onSubmit to prevent premature validation
+    mode: "onSubmit",
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
-      await registerUser(data).unwrap();
-    } catch (error) {
-      const apiError = error as { message: string };
-      if (apiError.message && typeof apiError.message === "string") {
-        const errorArray = apiError.message.split(",");
+      // 🔐 Step 1: Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
 
-        errorArray.forEach((e) => {
-          if (e.includes("Password")) {
-            setError("password", { message: e });
-          } else if (e.includes("Email")) {
-            setError("email", { message: e });
-          }
-        });
+      const firebaseUser = userCredential.user;
+
+      // 🔄 Step 2: Register user in your backend
+      await registerUser({
+        ...data,
+        firebaseUid: firebaseUser.uid, // optional but useful
+      }).unwrap();
+
+      // ✅ Success — redirect or show success message
+      navigate("/login");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+          ? error
+          : "Registration failed";
+
+      if (message.includes("email")) {
+        setError("email", { message });
+      } else if (message.includes("password")) {
+        setError("password", { message });
+      } else {
+        setError("email", { message });
       }
     }
   };
@@ -86,8 +119,6 @@ export default function RegisterForm() {
               error={!!errors.lastName}
               helperText={errors.lastName?.message}
             />
-
-            {/* Fixed Date of Birth field */}
             <TextField
               fullWidth
               label="Date of Birth"
@@ -99,22 +130,47 @@ export default function RegisterForm() {
                 shrink: true,
               }}
             />
-
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"} // toggle type here
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               fullWidth
               label="Confirm Password"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"} // toggle type here
               {...register("confirmPassword")}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"

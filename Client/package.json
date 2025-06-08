@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^2.7.0",
     "@remix-run/react": "^2.16.7",
     "emailjs-com": "^3.2.0",
+    "firebase": "^11.9.0",
     "react": "^19.0.0-rc.1",
     "react-dom": "^19.0.0-rc.1",
     "react-hook-form": "^7.56.1",

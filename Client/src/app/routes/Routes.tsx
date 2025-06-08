@@ -15,6 +15,8 @@ import RequireAuth from "./RequireAuth";
 import OrderList from "../../components/viewOrder/OrderList";
 import OrderDetails from "../../components/viewOrder/OrderDetails";
 import ProfilePage from "../../features/profile/ProfilePage";
+import ForgotPassword from "../../features/passwordreset/ForgotPassword";
+import ChangePasswordForm from "../../features/changePassword/ChangePasswordForm";
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -35,6 +37,8 @@ export const router = createBrowserRouter([
             {path: 'server-error', element: <ServerError/>},
             {path: 'login', element: <LoginForm/>},
             {path: 'register', element: <RegisterForm/>},
+            {path: 'forgot-password', element: <ForgotPassword/>},
+            {path: 'change-password', element: <ChangePasswordForm/>},
             {path: 'not-found', element: <NotFound/>},
             {path: '*', element: <Navigate replace to='/not-found'/>}
         ]
