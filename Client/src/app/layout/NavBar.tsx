@@ -25,7 +25,7 @@ import { setDarkMode } from "./uiSlice";
 import { useFetchCartQuery } from "../../features/cart/cartApi";
 import UserMenu from "./UserMenu";
 import { useUserInfoQuery } from "../../features/account/accountApi";
-import VisVec_Logo from "../../LOGO/VisVec_Logo.png";
+import VisVec_Logo from "../../LOGO/VisVec_Logo.svg";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -119,7 +119,7 @@ export default function NavBar() {
               component="img"
               src={VisVec_Logo}
               alt="Logo"
-              sx={{ width: 40, height: 40, mt: "2px" }}
+              sx={{ width: 60, height: 60, mt: "2px" }}
             />
             <Typography
               component={NavLink}
