@@ -128,7 +128,7 @@ export default function NavBar() {
               sx={navStyles}
               noWrap
             >
-              VISVEC Store
+              VISVEC
             </Typography>
           </Box>
 
