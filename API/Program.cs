@@ -3,6 +3,10 @@ using API.Entities;
 using API.MiddleWare;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+
+// Load environment variables from .env file
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +66,23 @@ app.MapFallbackToController("Index", "Fallback");
 try 
 {
     await DbInitializer.InitDb(app);
+    
+    // 👇 Seed roles after database initialization
+    using (var scope = app.Services.CreateScope())
+    {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        try
+        {
+            await DataSeeder.SeedRoles(roleManager);
+            logger.LogInformation("Roles seeded successfully");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while seeding roles");
+        }
+    }
 }
 catch (Exception ex)
 {
@@ -73,6 +94,22 @@ catch (Exception ex)
     try 
     {
         await DbInitializer.InitDb(app);
+        
+        // 👇 Retry role seeding as well
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            
+            try
+            {
+                await DataSeeder.SeedRoles(roleManager);
+                logger.LogInformation("Roles seeded successfully after retry");
+            }
+            catch (Exception seedEx)
+            {
+                logger.LogError(seedEx, "An error occurred while seeding roles after retry");
+            }
+        }
     }
     catch (Exception retryEx)
     {

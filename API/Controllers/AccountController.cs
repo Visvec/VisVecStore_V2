@@ -8,8 +8,58 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    public class AccountController(SignInManager<User> signInManager) : BaseApiController
+    public class AccountController(SignInManager<User> signInManager, IConfiguration configuration) : BaseApiController
     {
+        [HttpPost("login")]
+        public async Task<ActionResult> Login(LoginDto loginDto)
+        {
+            var adminEmail = configuration["ADMIN_EMAIL"];
+            var adminPassword = configuration["ADMIN_PASSWORD"];
+            
+            // Check if this is the admin account
+            if (loginDto.Email == adminEmail && loginDto.Password == adminPassword)
+            {
+                // Find or create admin user
+                var adminUser = await signInManager.UserManager.FindByEmailAsync(loginDto.Email);
+                
+                if (adminUser == null)
+                {
+                    // Create admin user if it doesn't exist
+                    adminUser = new User
+                    {
+                        UserName = loginDto.Email,
+                        Email = loginDto.Email,
+                        FirstName = "Admin",
+                        LastName = "User",
+                        EmailConfirmed = true
+                    };
+
+                    var createResult = await signInManager.UserManager.CreateAsync(adminUser, loginDto.Password);
+                    if (!createResult.Succeeded)
+                    {
+                        return BadRequest("Failed to create admin account");
+                    }
+
+                    // Add admin role
+                    await signInManager.UserManager.AddToRoleAsync(adminUser, "Admin");
+                }
+
+                // Sign in the admin user
+                await signInManager.SignInAsync(adminUser, isPersistent: false);
+                return Ok();
+            }
+
+            // Regular user login logic
+            var user = await signInManager.UserManager.FindByEmailAsync(loginDto.Email);
+            if (user == null) return Unauthorized("Invalid email or password");
+
+            var result = await signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
+            
+            if (!result.Succeeded) return Unauthorized("Invalid email or password");
+
+            return Ok();
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUser(RegisterDto registerDto)
         {
