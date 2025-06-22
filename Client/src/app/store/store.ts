@@ -7,6 +7,7 @@ import { errorApi } from "../../features/about/errorApi";
 import { cartApi } from "../../features/cart/cartApi";
 import { catalogSlice } from "../../features/catalog/catalogSlice";
 import { accountApi } from "../../features/account/accountApi";
+import { adminApi } from "../../features/admin/adminApi";
 
 export function configureTheStore(){
     return legacy_createStore(counterReducer)
@@ -18,6 +19,7 @@ export const store = configureStore({
         [errorApi.reducerPath]: errorApi.reducer,
         [cartApi.reducerPath]: cartApi.reducer,
         [accountApi.reducerPath]: accountApi.reducer,
+        [adminApi.reducerPath]: adminApi.reducer,
         counter: counterSlice.reducer,
         ui: uiSlice.reducer,
         catalog: catalogSlice.reducer
@@ -27,7 +29,8 @@ export const store = configureStore({
         catalogApi.middleware, 
         errorApi.middleware, 
         cartApi.middleware,
-        accountApi.middleware
+        accountApi.middleware,
+        adminApi.middleware
         )
 });
 export type RootState = ReturnType<typeof store.getState>

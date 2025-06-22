@@ -17,6 +17,7 @@ import OrderDetails from "../../components/viewOrder/OrderDetails";
 import ProfilePage from "../../features/profile/ProfilePage";
 import ForgotPassword from "../../features/passwordreset/ForgotPassword";
 import ChangePasswordForm from "../../features/changePassword/ChangePasswordForm";
+import InventoryPage from "../../features/admin/InventoryPage";
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
                  { path: 'orders', element: <OrderList/> }, 
                  { path:"/profile", element:<ProfilePage /> },
                  {path: 'order-details/:orderId', element: <OrderDetails/>},
+                 {path: 'inventory', element: <InventoryPage/>}
             ]},
             {path: '', element: <HomePage />},
             {path: 'catalog', element: <Catalog />},
