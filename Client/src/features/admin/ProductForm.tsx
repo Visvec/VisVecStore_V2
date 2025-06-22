@@ -1,7 +1,7 @@
 import { FieldValues, useForm } from "react-hook-form"
 import { createProductSchema, CreateProductSchema } from "../../lib/schemas/createProductSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Box, Button, Grid, Paper, Typography } from "@mui/material"
+import { Box, Button, Grid, Paper, Typography, useTheme, useMediaQuery } from "@mui/material"
 import AppTextInput from "../../app/shared/components/AppTextInput"
 import { useFetchFiltersQuery } from "../catalog/catalogApi"
 import AppSelectInput from "../../app/shared/components/AppSelectInput"
@@ -20,6 +20,10 @@ type Props = {
 }
 
 export default function ProductForm({setEditMode, product, refetch, setSelectedProduct}: Props) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+    
     const {control, handleSubmit, watch, reset, setError, formState: {isSubmitting} } = useForm<CreateProductSchema>({
          mode: 'onTouched',
         resolver: zodResolver(createProductSchema)
@@ -82,16 +86,31 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
     }
 
     return (
-        <Box component={Paper} sx={{p:4, maxWidth: 'lg', mx: 'auto'}}>
-            <Typography variant="h4" sx={{mb: 4}}>
+        <Box 
+            component={Paper} 
+            sx={{
+                p: { xs: 2, sm: 3, md: 4 },
+                maxWidth: 'lg', 
+                mx: 'auto',
+                width: '100%',
+                boxSizing: 'border-box'
+            }}
+        >
+            <Typography 
+                variant={isMobile ? "h5" : "h4"} 
+                sx={{
+                    mb: { xs: 2, sm: 3, md: 4 },
+                    textAlign: { xs: 'center', sm: 'left' }
+                }}
+            >
                 Product details
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 2, sm: 3 }}>
                     <Grid size={12}>
                         <AppTextInput control={control} name="name" label='Product name'/>
                     </Grid>  
-                    <Grid size={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         {data?.brands && 
                             <AppSelectInput 
                                 items={data.brands}
@@ -99,7 +118,7 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
                                 name="brand" 
                                 label='Brand'/>}
                     </Grid> 
-                    <Grid size={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         {data?.types && 
                             <AppSelectInput 
                                 items={data.types}
@@ -107,41 +126,84 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
                                 name="type" 
                                 label='Type'/>}
                     </Grid> 
-                    <Grid size={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <AppTextInput type="number" control={control} name="price" 
                             label='Price in Pesewas'/>
                     </Grid> 
-                    <Grid size={6}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <AppTextInput type="number" control={control} name="quantityInStock" label='Quantity in stock'/>
                     </Grid> 
                     <Grid size={12}>
                         <AppTextInput 
                             control={control} 
                             multiline
-                            rows={4}
+                            rows={isMobile ? 3 : 4}
                             name="description" 
                             label='Description'/>
                     </Grid> 
-                    <Grid size={12} display='flex' justifyContent='space-between' 
-                        alignItems='center'>
-                        <AppDropZone name="file" control={control}/>
-                        {filePreview ? (
-                            <img src={filePreview} alt='preview of image' 
-                                style={{maxHeight: 200}}/>
-                        ): product?.pictureUrl?(
-                            <img src={product?.pictureUrl} alt='preview of image' 
-                                style={{maxHeight: 200}}/>
-                        ): null}
+                    <Grid 
+                        size={12} 
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            justifyContent: 'space-between',
+                            alignItems: { xs: 'stretch', md: 'center' },
+                            gap: { xs: 2, md: 3 }
+                        }}
+                    >
+                        <Box sx={{ flex: { md: 1 }, minWidth: 0 }}>
+                            <AppDropZone name="file" control={control}/>
+                        </Box>
+                        {(filePreview || product?.pictureUrl) && (
+                            <Box 
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: { xs: 'center', md: 'flex-end' },
+                                    flex: { md: 1 },
+                                    minWidth: 0
+                                }}
+                            >
+                                <img 
+                                    src={filePreview || product?.pictureUrl} 
+                                    alt='preview of image'
+                                    style={{
+                                        maxHeight: isMobile ? 150 : isTablet ? 180 : 200,
+                                        maxWidth: '100%',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                        borderRadius: theme.shape.borderRadius
+                                    }}
+                                />
+                            </Box>
+                        )}
                     </Grid>           
                 </Grid>
-                <Box display='flex' justifyContent='space-between' sx={{mt: 3}}>
-                    <Button onClick ={() => setEditMode(false)} variant="contained" color="inherit">Cancel</Button>
+                <Box 
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        gap: { xs: 2, sm: 0 },
+                        mt: { xs: 2, sm: 3 }
+                    }}
+                >
+                    <Button 
+                        onClick={() => setEditMode(false)} 
+                        variant="contained" 
+                        color="inherit"
+                        fullWidth={isMobile}
+                        sx={{ order: { xs: 2, sm: 1 } }}
+                    >
+                        Cancel
+                    </Button>
                     <LoadingButton 
-                        loading ={isSubmitting}
+                        loading={isSubmitting}
                         variant="contained" 
                         color="success" 
                         type="submit"
-                        >
+                        fullWidth={isMobile}
+                        sx={{ order: { xs: 1, sm: 2 } }}
+                    >
                         Submit
                     </LoadingButton>
                 </Box>
