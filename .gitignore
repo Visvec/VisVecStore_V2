@@ -487,3 +487,4 @@ Client/.env.production
 API/appsettings.Development.json
 API/appsettings.Development.json
 API/.env.production
+API/appsettings.Development.json

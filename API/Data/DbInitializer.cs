@@ -36,10 +36,10 @@ public class DbInitializer
 
           var admin = new User
             {
-                UserName = "admin@test.com",
-                 Email = "admin@test.com"
+                UserName = "visvec2025@gmail.com",
+                 Email = "visvec2025@gmail.com"
             };
-            await userManager.CreateAsync(admin, "Pa$$w0rd");
+            await userManager.CreateAsync(admin, "Go0544622247@");
             await userManager.AddToRolesAsync(admin, ["Member","Admin"]);
 
         }
