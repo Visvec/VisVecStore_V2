@@ -3,7 +3,7 @@ import { TextField, Button, Typography, Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { saveShippingAddress } from '../../redux/slices/cartSlice';
 
-interface ShippingAddress {
+export interface ShippingAddress {
   hostel: string;
   landmark: string;
   city: string;
@@ -13,10 +13,9 @@ interface ShippingAddress {
 
 interface ShippingAddressFormProps {
   onAddressSubmit: (address: ShippingAddress) => void;
-  handleNext: () => void;
 }
 
-const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubmit, handleNext }) => {
+const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubmit }) => {
   const dispatch = useDispatch();
 
   const [address, setAddress] = useState<ShippingAddress>({
@@ -24,10 +23,17 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
     landmark: '',
     city: '',
     contact: '',
-    region: ''
+    region: '',
   });
 
-  // Simple validation: checks all fields are not empty
+  const addressFields: (keyof ShippingAddress)[] = [
+    'hostel',
+    'landmark',
+    'city',
+    'contact',
+    'region',
+  ];
+
   const validateForm = () => {
     return Object.values(address).every(field => field.trim() !== '');
   };
@@ -36,7 +42,7 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
     const { name, value } = e.target;
     setAddress(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -51,7 +57,17 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
     dispatch(saveShippingAddress(address));
     localStorage.setItem('shippingAddress', JSON.stringify(address));
     onAddressSubmit(address);
-    handleNext();
+  };
+
+  const getLabel = (field: keyof ShippingAddress): string => {
+    const labels: Record<keyof ShippingAddress, string> = {
+      hostel: 'Hostel',
+      landmark: 'Landmark',
+      city: 'City',
+      contact: 'Active Contact Number',
+      region: 'Region',
+    };
+    return labels[field];
   };
 
   return (
@@ -59,10 +75,10 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        maxWidth: { xs: '90%', sm: 480, md: 600 }, // wider on larger screens
+        maxWidth: { xs: '90%', sm: 480 },
         mx: 'auto',
         mt: 4,
-        px: { xs: 2, sm: 3 }, // horizontal padding for small devices
+        px: { xs: 2, sm: 3 },
       }}
     >
       <Typography
@@ -73,63 +89,20 @@ const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({ onAddressSubm
         Shipping Address
       </Typography>
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <TextField
-          label="Hostel"
-          variant="outlined"
-          fullWidth
-          required
-          name="hostel"
-          value={address.hostel}
-          onChange={handleChange}
-          inputProps={{ style: { fontSize: '1rem' } }}
-        />
-        <TextField
-          label="Landmark"
-          variant="outlined"
-          fullWidth
-          required
-          name="landmark"
-          value={address.landmark}
-          onChange={handleChange}
-          inputProps={{ style: { fontSize: '1rem' } }}
-        />
-        <TextField
-          label="City"
-          variant="outlined"
-          fullWidth
-          required
-          name="city"
-          value={address.city}
-          onChange={handleChange}
-          inputProps={{ style: { fontSize: '1rem' } }}
-        />
-        <TextField
-          label="Active Contact Number"
-          variant="outlined"
-          fullWidth
-          required
-          name="contact"
-          value={address.contact}
-          onChange={handleChange}
-          inputProps={{ style: { fontSize: '1rem' } }}
-        />
-        <TextField
-          label="Region"
-          variant="outlined"
-          fullWidth
-          required
-          name="region"
-          value={address.region}
-          onChange={handleChange}
-          inputProps={{ style: { fontSize: '1rem' } }}
-        />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {addressFields.map((field) => (
+          <TextField
+            key={field}
+            label={getLabel(field)}
+            variant="outlined"
+            fullWidth
+            required
+            name={field}
+            value={address[field]}
+            onChange={handleChange}
+            inputProps={{ style: { fontSize: '1rem' } }}
+          />
+        ))}
 
         <Button
           type="submit"

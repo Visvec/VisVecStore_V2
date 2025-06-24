@@ -1,10 +1,19 @@
-import { Box, Button, Paper, Step, StepLabel, Stepper, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Paper,
+  Step,
+  StepLabel,
+  Stepper,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import PaystackCheckout from "../payment/PaystackCheckout";
 import ShippingAddressForm from "../payment/ShippingAddressForm";
 import Review from "../payment/Review";
 
-const steps = ['Address', 'Payment', 'Review'];
+const steps = ["Address", "Payment", "Review"];
 
 export type ShippingAddress = {
   hostel: string;
@@ -29,36 +38,36 @@ interface CheckoutStepperProps {
 export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) {
   const [activeStep, setActiveStep] = useState(0);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    hostel: '',
-    landmark: '',
-    city: '',
-    contact: '',
-    region: ''
+    hostel: "",
+    landmark: "",
+    city: "",
+    contact: "",
+    region: "",
   });
 
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     amount: 0,
-    email: '',
-    phone: '',
-    provider: 'MTN',
-    reference: ''
+    email: "",
+    phone: "",
+    provider: "MTN",
+    reference: "",
   });
 
-  const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | 'pending'>('pending');
+  const [paymentStatus, setPaymentStatus] = useState<"success" | "failed" | "pending">("pending");
 
   const theme = useTheme();
-  const isSmDown = useMediaQuery(theme.breakpoints.down('sm')); // For small devices
+  const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     onStepChange(activeStep);
   }, [activeStep, onStepChange]);
 
   const handleNext = () => {
-    setActiveStep(step => step + 1);
+    setActiveStep((step) => step + 1);
   };
 
   const handleBack = () => {
-    setActiveStep(step => step - 1);
+    setActiveStep((step) => step - 1);
   };
 
   const handleAddressSubmit = (address: ShippingAddress) => {
@@ -66,21 +75,33 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
     handleNext();
   };
 
-  const handlePaymentComplete = (status: 'success' | 'failed', details: PaymentDetails) => {
+  const handlePaymentComplete = (status: "success" | "failed", details: PaymentDetails) => {
     setPaymentStatus(status);
     setPaymentDetails(details);
-    if (status === 'success') {
+    if (status === "success") {
       handleNext();
     }
   };
 
   const handleTryAgain = () => {
-    setActiveStep(1); // Go back to payment step
+    setActiveStep(1); // Go back to Payment step
+    setPaymentStatus("pending");
   };
 
   return (
-    <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, maxWidth: 600, mx: 'auto' }}>
-      <Stepper activeStep={activeStep} orientation={isSmDown ? 'vertical' : 'horizontal'} sx={{ mb: 3 }}>
+    <Paper
+      sx={{
+        p: { xs: 2, sm: 3 },
+        borderRadius: 3,
+        maxWidth: 600,
+        mx: "auto",
+      }}
+    >
+      <Stepper
+        activeStep={activeStep}
+        orientation={isSmDown ? "vertical" : "horizontal"}
+        sx={{ mb: 3 }}
+      >
         {steps.map((label, index) => (
           <Step key={index} completed={activeStep > index}>
             <StepLabel>{label}</StepLabel>
@@ -90,13 +111,11 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
 
       <Box sx={{ minHeight: 300 }}>
         {activeStep === 0 && (
-          <ShippingAddressForm onAddressSubmit={handleAddressSubmit} handleNext={function (): void {
-            throw new Error("Function not implemented.");
-          } } />
+          <ShippingAddressForm onAddressSubmit={handleAddressSubmit} />
         )}
         {activeStep === 1 && (
-          <PaystackCheckout 
-            handleNext={handlePaymentComplete} 
+          <PaystackCheckout
+            handleNext={handlePaymentComplete}
             shippingAddress={shippingAddress}
           />
         )}
@@ -112,21 +131,19 @@ export default function CheckoutStepper({ onStepChange }: CheckoutStepperProps) 
 
       <Box
         display="flex"
-        flexDirection={isSmDown ? 'column' : 'row'}
+        flexDirection={isSmDown ? "column" : "row"}
         justifyContent="space-between"
         gap={isSmDown ? 1 : 0}
         pt={2}
       >
         <Button
           onClick={handleBack}
-          disabled={activeStep === 0 || paymentStatus === 'success'}
+          disabled={activeStep === 0 || paymentStatus === "success"}
           fullWidth={isSmDown}
           variant="outlined"
         >
           Back
         </Button>
-
-        {/* Show Next or Place Order button only on relevant steps */}
       </Box>
     </Paper>
   );
