@@ -74,7 +74,15 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
   };
 
   const handlePay = async () => {
+    const paymentDetails: PaymentDetails = {
+      amount: totalAmountInPesewas,
+      email: form.email,
+      phone: form.phone,
+      provider: form.provider,
+    };
+
     try {
+      // Step 1: Initiate payment with Paystack
       const response = await fetch(API_URLS.mobileMoneyPayment, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,55 +97,54 @@ const PaystackCheckout = ({ handleNext, shippingAddress }: PaystackCheckoutProps
 
       const result = await response.json();
 
-      const paymentDetails: PaymentDetails = {
-        amount: totalAmountInPesewas,
-        email: form.email,
-        phone: form.phone,
-        provider: form.provider,
-        reference: result?.data?.reference || '',
-      };
+      // Update payment details with reference if available
+      paymentDetails.reference = result?.data?.reference || '';
 
+      // Always save payment details for reference
       localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
 
-      if (response.ok && result.status === true) {
-        toast.success('Mobile money charge initiated!');
-
-        if (cart?.items) {
-          const orderItems = mapCartItemsToOrderItems(cart.items);
-          const order: Order = {
-            id: Date.now().toString(),
-            items: orderItems,
-            subtotal,
-            deliveryFee,
-            total: subtotal + deliveryFee,
-            shippingAddress,
-            paymentDetails,
-            status: 'pending',
-          };
-
-          saveOrderToLocalStorage(order);
-
-          for (const item of cart.items) {
-            await removeCartItem({ productId: item.productId, quantity: item.quantity }).unwrap();
-          }
-        }
-
-        handleNext('success', paymentDetails);
-      } else {
+      // Step 2: Check if payment initiation was successful
+      if (!response.ok || result.status !== true) {
         toast.error(result.message || 'Mobile money charge failed');
         handleNext('failed', paymentDetails);
+        return;
       }
-    } catch {
-      const paymentDetails: PaymentDetails = {
-        amount: totalAmountInPesewas,
-        email: form.email,
-        phone: form.phone,
-        provider: form.provider,
-      };
 
-      localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
+      // Step 3: Payment initiated successfully - now handle post-payment operations
+      if (cart?.items) {
+        const orderItems = mapCartItemsToOrderItems(cart.items);
+        const order: Order = {
+          id: Date.now().toString(),
+          items: orderItems,
+          subtotal,
+          deliveryFee,
+          total: subtotal + deliveryFee,
+          shippingAddress,
+          paymentDetails,
+          status: 'pending',
+        };
 
-      toast.error('Error initiating mobile money payment');
+        // Save order to localStorage
+        saveOrderToLocalStorage(order);
+
+        // Remove items from cart
+        for (const item of cart.items) {
+          await removeCartItem({ 
+            productId: item.productId, 
+            quantity: item.quantity 
+          }).unwrap();
+        }
+      }
+
+      // All operations completed successfully
+      toast.success('Mobile money charge initiated successfully!');
+      handleNext('success', paymentDetails);
+
+    } catch (networkError) {
+      // Network or API call failed
+      console.error('Payment initiation failed:', networkError);
+      
+      toast.error('Failed to initiate mobile money payment. Please check your connection and try again.');
       handleNext('failed', paymentDetails);
     }
   };
